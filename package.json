@@ -1,0 +1,41 @@
+{
+  "name": "wonka",
+  "version": "1.0.0",
+  "description": "Wonka is a JS library meant that simplifies the minting process on Metaplex's CandyMachine. ",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "test": "jest --config jestconfig.json",
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
+    "prepare" : "npm run build",
+    "prepublishOnly" : "npm test && npm run lint",
+    "preversion" : "npm run lint",
+    "version" : "npm run format && git add -A src",
+    "postversion" : "git push && git push --tags"
+  },
+  "keywords": [
+    "candy",
+    "machine",
+    "metaplex",
+    "nft",
+    "solana",
+    "crypto",
+    "mint"
+  ],
+  "files": [
+    "lib/**/*"
+  ],
+  "author": "@0xZoZoZo",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^27.4.0",
+    "jest": "^27.4.7",
+    "prettier": "^2.5.1",
+    "ts-jest": "^27.1.2",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^4.5.4"
+  }
+}
