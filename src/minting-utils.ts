@@ -32,14 +32,6 @@ const mintCandyMachineToken = async (
     const rent = await connection.getMinimumBalanceForRentExemption(
       MintLayout.span
     );
-    console.log(`Mint with the following accounts:
-    candy machine config: ${config.toString()}
-    mint public key: ${mint.publicKey.toString()}
-    token PDA: ${tokenPDA.toString()}
-    metadata PDA: ${metadataPDA.toString()}
-    master edition PDA: ${masterEdition.toString()}
-    rent: ${rent}
-    `)
     const accounts = {
       config,
       candyMachine: candyMachineId,
@@ -47,7 +39,7 @@ const mintCandyMachineToken = async (
       wallet: treasuryAddress,
       mint: mint.publicKey,
       metadata: metadataPDA,
-      masterEdition: masterEdition,
+      masterEdition,
       mintAuthority: recipientWalletAddress.publicKey,
       updateAuthority: recipientWalletAddress.publicKey,
       tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
@@ -89,23 +81,20 @@ const mintCandyMachineToken = async (
     ];
     const candyMachineProgramIDL = await Program.fetchIdl(CANDY_MACHINE_PROGRAM_ID, provider);
     const candyMachineProgram = new Program(candyMachineProgramIDL!, CANDY_MACHINE_PROGRAM_ID, provider);
-    //@ts-ignore
+    // @ts-ignore
     const txn = await candyMachineProgram.rpc.mintNft({
       accounts,
       signers,
       instructions,
     });
-    console.log('txn:', txn);
     return new Promise(resolve => {
       connection.onSignatureWithOptions(
         txn,
         async (notification, context) => {
           if (notification.type === 'status') {
-            console.log('Received status event');
             const { result } = notification;
-            console.log(result)
             if (!result.err) {
-              console.log('NFT Minted!');
+              // NFT got minted!
               resolve(txn)
             }
           }
@@ -115,13 +104,11 @@ const mintCandyMachineToken = async (
     })
   } catch (error: any) {
     const message = _getWarningMesssage(error)
-    console.warn(message);
     return { error, message }
   }
 };
 
 const _getWarningMesssage = (error: any) => {
-  console.log(error)
   if (error.msg) {
     if (error.code === 311) {
       return `All mints have been sold out.`;
@@ -130,6 +117,7 @@ const _getWarningMesssage = (error: any) => {
     }
   } else {
     if (error.message.indexOf('0x138')) {
+      return 'Minting failed! Please try again!';
     } else if (error.message.indexOf('0x137')) {
       return `All mints have been sold out.`;
     } else if (error.message.indexOf('0x135')) {

@@ -36,14 +36,12 @@ const getCandyMachineMints = async (candyMachineId: string, connection: Connecti
       ],
     }
   );
-  const mintMetadata = [];
-  for (let index = 0; index < metadataAccounts.length; index++) {
-    const account = metadataAccounts[index];
+  
+  return metadataAccounts.map(async (account) => {
     const accountInfo = await connection.getAccountInfo(account.pubkey)
     const metadata = new Metadata(candyMachineId.toString(), accountInfo!);
-    mintMetadata.push(metadata);
-  }
-  return mintMetadata;
+    return metadata
+  })
 };
 
 export { 
