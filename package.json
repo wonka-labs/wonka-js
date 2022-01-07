@@ -1,5 +1,5 @@
 {
-  "name": "wonka",
+  "name": "@triton-labs/wonka",
   "version": "1.0.0",
   "description": "Wonka is a JS library meant that simplifies the minting process on Metaplex's CandyMachine. ",
   "main": "lib/index.js",
@@ -9,11 +9,11 @@
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
-    "prepare" : "npm run build",
-    "prepublishOnly" : "npm test && npm run lint",
-    "preversion" : "npm run lint",
-    "version" : "npm run format && git add -A src",
-    "postversion" : "git push && git push --tags"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "keywords": [
     "candy",
@@ -29,8 +29,24 @@
   ],
   "author": "@0xZoZoZo",
   "license": "ISC",
+  "dependencies": {
+    "@metaplex/js": "^4.11.1",
+    "@project-serum/anchor": "^0.18.2",
+    "@solana/spl-token": "^0.1.8",
+    "@solana/web3.js": "^1.30.2",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "arweave": "^1.10.18",
+    "next": "^12.0.7",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "^5.0.0",
+    "web-vitals": "^1.0.1"
+  },
   "devDependencies": {
     "@types/jest": "^27.4.0",
+    "husky": "^7.0.4",
     "jest": "^27.4.7",
     "prettier": "^2.5.1",
     "ts-jest": "^27.1.2",

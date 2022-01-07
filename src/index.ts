@@ -1,1 +1,3 @@
-export const Greeter = (name: string) => `Hello ${name}`;
+import { Wonka } from "./wonka";
+
+export { Wonka }
