@@ -1,6 +1,6 @@
 # Wonka JS
 
-`Wonka` is a JS/TS layer that simplifies the minting process on top of [MetaPlex's Candy Machine](https://docs.metaplex.com/candy-machine-v2/introduction). Once you have [follow the instructions to upload your NFTs](https://docs.metaplex.com/candy-machine-v2/preparing-assets), you can easily use the following three commands to build your mint flow:
+`Wonka` is a JS/TS layer that simplifies the minting process on top of [MetaPlex's Candy Machine](https://docs.metaplex.com/candy-machine-v2/introduction). Once you have [followed the instructions to upload your NFTs](https://docs.metaplex.com/candy-machine-v2/preparing-assets), you can easily use the following three commands to build your mint flow:
 
 * `mintCandyMachineToken(..)`
 * `getCandyMachineMints(..)`
