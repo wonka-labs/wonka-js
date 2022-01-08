@@ -36,12 +36,11 @@ const getCandyMachineMints = async (candyMachineId: string, connection: Connecti
       ],
     }
   );
-  
-  return metadataAccounts.map(async (account) => {
+  return await Promise.all(metadataAccounts.map(async (account) => {
     const accountInfo = await connection.getAccountInfo(account.pubkey)
     const metadata = new Metadata(candyMachineId.toString(), accountInfo!);
     return metadata
-  })
+  }))
 };
 
 export { 
