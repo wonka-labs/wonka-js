@@ -1,7 +1,9 @@
 
 import { Program, Provider, web3 } from '@project-serum/anchor';
-import { Connection, PublicKey, Keypair } from '@solana/web3.js';
+import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js';
 import { Token } from '@solana/spl-token';
+import * as anchor from '@project-serum/anchor';
+import { sendTransactions } from './connection'
 import {
   MintLayout,
   TOKEN_PROGRAM_ID,
@@ -16,96 +18,25 @@ import {
   TOKEN_METADATA_PROGRAM_ID,
 } from './program-ids';
 
-const mintCandyMachineToken = async (
-  connection: Connection,
-  provider: Provider,
-  recipientWalletAddress: Keypair,
-  treasuryAddress: string,
-  candyMachineId: string,
-  candyMachineConfig: string) => {
-  try {
-    const config = new web3.PublicKey(candyMachineConfig);
-    const mint = web3.Keypair.generate();
-    const tokenPDA = await getTokenWallet(recipientWalletAddress, mint)
-    const metadataPDA = await Metadata.getPDA(mint.publicKey);
-    const masterEdition = await MasterEdition.getPDA(mint.publicKey);
-    const rent = await connection.getMinimumBalanceForRentExemption(
-      MintLayout.span
-    );
-    const accounts = {
-      config,
-      candyMachine: candyMachineId,
-      payer: recipientWalletAddress.publicKey,
-      wallet: treasuryAddress,
-      mint: mint.publicKey,
-      metadata: metadataPDA,
-      masterEdition,
-      mintAuthority: recipientWalletAddress.publicKey,
-      updateAuthority: recipientWalletAddress.publicKey,
-      tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-      tokenProgram: TOKEN_PROGRAM_ID,
-      systemProgram: web3.SystemProgram.programId,
-      rent: web3.SYSVAR_RENT_PUBKEY,
-      clock: web3.SYSVAR_CLOCK_PUBKEY,
-    };
-    const signers = [mint];
-    const instructions = [
-      web3.SystemProgram.createAccount({
-        fromPubkey: recipientWalletAddress.publicKey,
-        newAccountPubkey: mint.publicKey,
-        space: MintLayout.span,
-        lamports: rent,
-        programId: TOKEN_PROGRAM_ID,
-      }),
-      Token.createInitMintInstruction(
-        TOKEN_PROGRAM_ID,
-        mint.publicKey,
-        0,
-        recipientWalletAddress.publicKey,
-        recipientWalletAddress.publicKey
-      ),
-      createAssociatedTokenAccountInstruction(
-        tokenPDA,
-        recipientWalletAddress.publicKey,
-        recipientWalletAddress.publicKey,
-        mint.publicKey
-      ),
-      Token.createMintToInstruction(
-        TOKEN_PROGRAM_ID,
-        mint.publicKey,
-        tokenPDA,
-        recipientWalletAddress.publicKey,
-        [],
-        1
-      ),
-    ];
-    const candyMachineProgramIDL = await Program.fetchIdl(CANDY_MACHINE_PROGRAM_ID, provider);
-    const candyMachineProgram = new Program(candyMachineProgramIDL!, CANDY_MACHINE_PROGRAM_ID, provider);
-    // @ts-ignore
-    const txn = await candyMachineProgram.rpc.mintNft({
-      accounts,
-      signers,
-      instructions,
-    });
-    return new Promise(resolve => {
-      connection.onSignatureWithOptions(
-        txn,
-        async (notification, context) => {
-          if (notification.type === 'status') {
-            const { result } = notification;
-            if (!result.err) {
-              // NFT got minted!
-              resolve(txn)
-            }
-          }
-        },
-        { commitment: 'processed' }
-      );
-    })
-  } catch (error: any) {
-    const message = _getWarningMesssage(error)
-    return { error, message }
-  }
+const _getTokenWallet = async (wallet: PublicKey, mint: PublicKey) => {
+  return (
+    await web3.PublicKey.findProgramAddress(
+      [
+        wallet.toBuffer(),
+        TOKEN_PROGRAM_ID.toBuffer(),
+        mint.toBuffer()],
+      ASSOCIATED_TOKEN_PROGRAM_ID
+    )
+  )[0];
+};
+
+const _getCandyMachineCreator = async (
+  candyMachine: anchor.web3.PublicKey,
+): Promise<[anchor.web3.PublicKey, number]> => {
+  return await anchor.web3.PublicKey.findProgramAddress(
+    [Buffer.from('candy_machine'), candyMachine.toBuffer()],
+    CANDY_MACHINE_PROGRAM_ID,
+  );
 };
 
 const _getWarningMesssage = (error: any) => {
@@ -127,19 +58,7 @@ const _getWarningMesssage = (error: any) => {
   return 'Minting failed! Please try again!';
 }
 
-const getTokenWallet = async (wallet: Keypair, mint: Keypair) => {
-  return (
-    await web3.PublicKey.findProgramAddress(
-      [
-        wallet.publicKey.toBuffer(),
-        TOKEN_PROGRAM_ID.toBuffer(),
-        mint.publicKey.toBuffer()],
-      ASSOCIATED_TOKEN_PROGRAM_ID
-    )
-  )[0];
-};
-
-const createAssociatedTokenAccountInstruction = (
+const _createAssociatedTokenAccountInstruction = (
   associatedTokenAddress: PublicKey,
   payer: PublicKey,
   walletAddress: PublicKey,
@@ -168,6 +87,128 @@ const createAssociatedTokenAccountInstruction = (
     data: Buffer.from([]),
   });
 };
+
+const _mintCandyMachineToken = async (
+  provider: Provider,
+  candyMachineAddress: PublicKey,
+  recipientWalletAddress: Keypair,
+) => {
+  const mint = Keypair.generate();
+  const candyMachineProgramIDL = await Program.fetchIdl(CANDY_MACHINE_PROGRAM_ID, provider);
+  const candyMachineProgram = new Program(candyMachineProgramIDL!, CANDY_MACHINE_PROGRAM_ID, provider);
+  const userTokenAccountAddress = await _getTokenWallet(
+    recipientWalletAddress.publicKey,
+    mint.publicKey,
+  );
+  const candyMachine: any = await candyMachineProgram.account.candyMachine.fetch(
+    candyMachineAddress,
+  );
+  const remainingAccounts: TransactionInstruction[] = [];
+  const signers: anchor.web3.Keypair[] = [mint];
+  const cleanupInstructions: TransactionInstruction[] = [];
+  const instructions = [
+    anchor.web3.SystemProgram.createAccount({
+      fromPubkey: recipientWalletAddress.publicKey,
+      newAccountPubkey: mint.publicKey,
+      space: MintLayout.span,
+      lamports:
+        await candyMachineProgram.provider.connection.getMinimumBalanceForRentExemption(
+          MintLayout.span,
+        ),
+      programId: TOKEN_PROGRAM_ID,
+    }),
+    Token.createInitMintInstruction(
+      TOKEN_PROGRAM_ID,
+      mint.publicKey,
+      0,
+      recipientWalletAddress.publicKey,
+      recipientWalletAddress.publicKey,
+    ),
+    _createAssociatedTokenAccountInstruction(
+      userTokenAccountAddress,
+      recipientWalletAddress.publicKey,
+      recipientWalletAddress.publicKey,
+      mint.publicKey,
+    ),
+    Token.createMintToInstruction(
+      TOKEN_PROGRAM_ID,
+      mint.publicKey,
+      userTokenAccountAddress,
+      recipientWalletAddress.publicKey,
+      [],
+      1,
+    ),
+  ];
+  const metadataAddress = await Metadata.getPDA(mint.publicKey);
+  const masterEdition = await MasterEdition.getPDA(mint.publicKey);
+  const [candyMachineCreator, creatorBump] = await _getCandyMachineCreator(
+    candyMachineAddress,
+  );
+
+  instructions.push(
+    // @ts-ignore
+    await candyMachineProgram.instruction.mintNft(creatorBump, {
+      accounts: {
+        candyMachine: candyMachineAddress,
+        candyMachineCreator,
+        payer: recipientWalletAddress.publicKey,
+        wallet: candyMachine.wallet,
+        mint: mint.publicKey,
+        metadata: metadataAddress,
+        masterEdition,
+        mintAuthority: recipientWalletAddress.publicKey,
+        updateAuthority: recipientWalletAddress.publicKey,
+        tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram: web3.SystemProgram.programId,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+        clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
+        recentBlockhashes: anchor.web3.SYSVAR_RECENT_BLOCKHASHES_PUBKEY,
+        instructionSysvarAccount: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
+      },
+      remainingAccounts:
+        remainingAccounts.length > 0 ? remainingAccounts : undefined,
+    }),
+  );
+
+  return (
+    await sendTransactions(
+      provider.connection,
+      recipientWalletAddress,
+      [instructions, cleanupInstructions],
+      [signers, []],
+    )
+  )
+}
+
+const mintCandyMachineToken = async (
+  provider: Provider,
+  candyMachineAddress: PublicKey,
+  recipientWalletAddress: Keypair,
+) => {
+  try {
+    const txid = await _mintCandyMachineToken(provider, candyMachineAddress, recipientWalletAddress)
+    console.log(txid)
+    // return new Promise(resolve => {
+    //   provider.connection.onSignatureWithOptions(
+    //     txid,
+    //     async (notification, context) => {
+    //       if (notification.type === 'status') {
+    //         const { result } = notification;
+    //         if (!result.err) {
+
+    //           resolve(txid)
+    //         }
+    //       }
+    //     },
+    //     { commitment: 'processed' }
+    //   );
+    // })
+  } catch (error: any) {
+    const message = _getWarningMesssage(error)
+    return { error, message }
+  }
+}
 
 export {
   mintCandyMachineToken,

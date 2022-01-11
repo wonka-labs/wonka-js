@@ -1,39 +1,34 @@
 
 import { Program, Provider } from '@project-serum/anchor';
-import { Keypair } from '@solana/web3.js';
+import { Keypair, PublicKey } from '@solana/web3.js';
 import {
   CANDY_MACHINE_PROGRAM_ID,
 } from './program-ids';
-
+import { web3 } from '@project-serum/anchor';
 import { getCandyMachineMints } from './metadata-utils';
 import { mintCandyMachineToken } from './minting-utils';
 
 export class Wonka {
   private _provider: Provider
-  private _candyMachineId: string
-  private _candyMachineConfig: string
+  private _candyMachineId: PublicKey
 
-  public constructor(provider: Provider, candyMachineId: string, candyMachineConfig: string) {
+  public constructor(provider: Provider, candyMachineId: string) {
     this._provider = provider
-    this._candyMachineId = candyMachineId
-    this._candyMachineConfig = candyMachineConfig
+    this._candyMachineId = new web3.PublicKey(candyMachineId);
   }
 
   public async getCandyMachineMints() {
     return await getCandyMachineMints(
-      this._candyMachineId,
+      this._candyMachineId.toString(),
       this._provider.connection
     )
   }
 
-  public async mintCandyMachineToken(recipientWalletAddress: Keypair, treasuryAddress: string) {
+  public async mintCandyMachineToken(recipientWalletAddress: Keypair) {
     return await mintCandyMachineToken(
-      this._provider.connection,
       this._provider,
-      recipientWalletAddress,
-      treasuryAddress,
       this._candyMachineId,
-      this._candyMachineConfig
+      recipientWalletAddress,
     )
   }
 
