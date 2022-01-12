@@ -51,6 +51,7 @@ const mintCandyMachineToken = async(recipientWallet: Keypair) => {
   const provider = ...;
   const candyMachineId = ...;
   const wonka = new Wonka(provider, candyMachineId)
+  // For now, pass in window.solana as recipientWallet once connected; will decouple soon.
   const candyMachineMintId = await wonka.mintCandyMachineToken(recipientWallet)
   console.log(candyMachineMintId)
 }
