@@ -1,5 +1,8 @@
-import { Connection } from '@solana/web3.js';
-import { Metadata, MetadataProgram } from '@metaplex-foundation/mpl-token-metadata';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { Metadata, MetadataProgram, MetadataDataData } from '@metaplex-foundation/mpl-token-metadata';
+import { Wallet, actions} from '@metaplex/js';
+import { ArweaveUploader } from '../arweave-uploader';
+import log from 'loglevel';
 
 const MAX_NAME_LENGTH = 32;
 const MAX_URI_LENGTH = 200;
@@ -39,4 +42,67 @@ const getCandyMachineMints = async (candyMachineId: string, connection: Connecti
   );
 };
 
-export { getCandyMachineMints };
+const getMintMetadata = async (connection: Connection, mintAddress: string): Promise<MetadataDataData> => {
+  const metadataPDA = await Metadata.getPDA(mintAddress);
+  const metaData = await Metadata.load(connection, metadataPDA);
+  return metaData.data.data as MetadataDataData
+}
+
+const updateMintURI = async (
+  connection: Connection, 
+  arweaveUploader: ArweaveUploader,
+  wallet: Wallet, 
+  mintKey: string, 
+  mintURI: string,
+  context: any) => {
+  let metadataData = await getMintMetadata(connection, mintKey)
+  let metadataDataData = await fetch(metadataData.uri)
+  let metadataDataDataJSON = await metadataDataData.json()
+  metadataDataDataJSON.image = mintURI
+  metadataDataDataJSON.properties.files[0].uri = mintURI
+  metadataDataDataJSON.context = context
+  const metadataDataDataJSONArweaveURI = await arweaveUploader.uploadJSON(metadataDataDataJSON)
+  metadataData.uri = metadataDataDataJSONArweaveURI
+  const txid = await actions.updateMetadata({
+    connection, 
+    editionMint: new PublicKey(mintKey),
+    wallet,
+    newMetadataData: metadataData,
+  })
+  log.info(`Starting update metadata transaction with id:${txid}.`)
+  return new Promise((resolve, reject) => {
+    connection.onSignatureWithOptions(
+      txid,
+      async (notification, context) => {
+        log.info(`Got notification of type: ${notification.type} from txid: ${txid}.`);
+        if (notification.type === 'status') {
+          const { result } = notification;
+          if (result.err) {
+            reject(txid);
+          } else {
+            resolve(txid)
+          }
+        }
+      },
+      { commitment: 'processed' },
+    );
+  });
+}
+
+const updateMintImage = async (
+  b64string: string,
+  connection: Connection, 
+  arweaveUploader: ArweaveUploader,
+  wallet: Wallet, 
+  mintKey: string,
+  context: any) => { 
+    const uri = await arweaveUploader.uploadBase64PNG(b64string)
+    return updateMintURI(connection, arweaveUploader, wallet, mintKey, uri, context)
+}
+
+export { 
+  getCandyMachineMints,
+  getMintMetadata,
+  updateMintURI,
+  updateMintImage
+ };

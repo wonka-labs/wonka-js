@@ -2,7 +2,7 @@ import { Program, Provider } from '@project-serum/anchor';
 import { Keypair, PublicKey } from '@solana/web3.js';
 import { CANDY_MACHINE_PROGRAM_ID } from './program-ids';
 import { web3 } from '@project-serum/anchor';
-import { getCandyMachineMints } from './utils/metadata-utils';
+import { getCandyMachineMints, getMintMetadata } from './utils/metadata-utils';
 import { mintCandyMachineToken } from './utils/minting-utils';
 
 export class Wonka {
@@ -20,6 +20,10 @@ export class Wonka {
 
   public async mintCandyMachineToken(recipientWalletAddress: Keypair) {
     return await mintCandyMachineToken(this._provider, this._candyMachineId, recipientWalletAddress);
+  }
+
+  public async getMintMetadata(mintAddress: string) {
+    return await getMintMetadata(this._provider.connection, mintAddress)
   }
 
   public async getCandyMachineState() {
