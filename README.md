@@ -36,8 +36,7 @@ const getCandyMachineMints = async() => {
   console.log("Getting candy machine mints...")
   const provider = ...;
   const candyMachineId = ...;
-  const candyMachineConfigId = ...;
-  const wonka = new Wonka(provider, candyMachineId, candyMachineConfigId)
+  const wonka = new Wonka(provider, candyMachineId)
   const candyMachineMints = await wonka.getCandyMachineMints()
   console.log(candyMachineMints)
 }
@@ -49,18 +48,16 @@ Mints an NFT; you either get an error with a message or the ID of the mint in re
 ```JS
 const mintCandyMachineToken = async(recipientWallet: Keypair) => {
   console.log("Minting a new candy machine token...")
-  const provider = getProvider();
+  const provider = ...;
   const candyMachineId = ...;
-  const candyMachineConfigId = ...;
-  const candyMachineTreasuryAddress = ...;
-  const wonka = new Wonka(provider, candyMachineId, candyMachineConfigId)
-  const candyMachineMintId = await wonka.mintCandyMachineToken(recipientWallet, candyMachineTreasuryAddress)
+  const wonka = new Wonka(provider, candyMachineId)
+  const candyMachineMintId = await wonka.mintCandyMachineToken(recipientWallet)
   console.log(candyMachineMintId)
 }
 ```
 
 ### Storing Ids
-The question is where to store information like candy machine ID or config ID, etc. If you're using React or Next.js, you can easily use the .env file so that the code above looks more like:
+The question is where to store information like candy machine ID, etc. If you're using React or Next.js, you can easily use the .env file so that the code above looks more like:
 
 ```Js
 const candyMachineId = process.env.NEXT_PUBLIC_CANDY_MACHINE_ID!; // For Next.js
