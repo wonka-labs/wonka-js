@@ -1,3 +1,3 @@
-import { Wonka } from "./wonka";
+import { Wonka } from './wonka';
 
-export { Wonka }
+export { Wonka };

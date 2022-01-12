@@ -1,33 +1,19 @@
-
 import { Program, Provider, web3 } from '@project-serum/anchor';
 import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js';
 import { Token } from '@solana/spl-token';
 import * as anchor from '@project-serum/anchor';
-import { sendTransaction } from './connection-utils'
-import {
-  MintLayout,
-  TOKEN_PROGRAM_ID,
-  ASSOCIATED_TOKEN_PROGRAM_ID
-} from '@solana/spl-token';
-import {
-  Metadata,
-  MasterEdition
-} from '@metaplex-foundation/mpl-token-metadata';
-import {
-  CANDY_MACHINE_PROGRAM_ID,
-  TOKEN_METADATA_PROGRAM_ID,
-} from '../program-ids';
+import { sendTransaction } from './connection-utils';
+import { MintLayout, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { Metadata, MasterEdition } from '@metaplex-foundation/mpl-token-metadata';
+import { CANDY_MACHINE_PROGRAM_ID, TOKEN_METADATA_PROGRAM_ID } from '../program-ids';
 import assert from 'assert';
 import log from 'loglevel';
 
 const _getTokenWallet = async (wallet: PublicKey, mint: PublicKey) => {
   return (
     await web3.PublicKey.findProgramAddress(
-      [
-        wallet.toBuffer(),
-        TOKEN_PROGRAM_ID.toBuffer(),
-        mint.toBuffer()],
-      ASSOCIATED_TOKEN_PROGRAM_ID
+      [wallet.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mint.toBuffer()],
+      ASSOCIATED_TOKEN_PROGRAM_ID,
     )
   )[0];
 };
@@ -58,13 +44,13 @@ const _getWarningMesssage = (error: any) => {
     }
   }
   return 'Minting failed! Please try again!';
-}
+};
 
 const _createAssociatedTokenAccountInstruction = (
   associatedTokenAddress: PublicKey,
   payer: PublicKey,
   walletAddress: PublicKey,
-  splTokenMintAddress: PublicKey
+  splTokenMintAddress: PublicKey,
 ) => {
   const keys = [
     { pubkey: payer, isSigner: true, isWritable: true },
@@ -95,29 +81,21 @@ const _mintCandyMachineToken = async (
   candyMachineAddress: PublicKey,
   recipientWalletAddress: Keypair,
 ) => {
-  assert(provider !== null, "Expecting a valid provider!")
-  assert(candyMachineAddress !== null, "Expecting a valid candy machine address!")
-  assert(recipientWalletAddress !== null, "Expecting a valid recipient address!")
+  assert(provider !== null, 'Expecting a valid provider!');
+  assert(candyMachineAddress !== null, 'Expecting a valid candy machine address!');
+  assert(recipientWalletAddress !== null, 'Expecting a valid recipient address!');
   const mint = Keypair.generate();
   const candyMachineProgramIDL = await Program.fetchIdl(CANDY_MACHINE_PROGRAM_ID, provider);
   const candyMachineProgram = new Program(candyMachineProgramIDL!, CANDY_MACHINE_PROGRAM_ID, provider);
-  const userTokenAccountAddress = await _getTokenWallet(
-    recipientWalletAddress.publicKey,
-    mint.publicKey,
-  );
-  const candyMachine: any = await candyMachineProgram.account.candyMachine.fetch(
-    candyMachineAddress,
-  );
+  const userTokenAccountAddress = await _getTokenWallet(recipientWalletAddress.publicKey, mint.publicKey);
+  const candyMachine: any = await candyMachineProgram.account.candyMachine.fetch(candyMachineAddress);
   const signers = [mint];
   const instructions = [
     anchor.web3.SystemProgram.createAccount({
       fromPubkey: recipientWalletAddress.publicKey,
       newAccountPubkey: mint.publicKey,
       space: MintLayout.span,
-      lamports:
-        await candyMachineProgram.provider.connection.getMinimumBalanceForRentExemption(
-          MintLayout.span,
-        ),
+      lamports: await candyMachineProgram.provider.connection.getMinimumBalanceForRentExemption(MintLayout.span),
       programId: TOKEN_PROGRAM_ID,
     }),
     Token.createInitMintInstruction(
@@ -144,9 +122,7 @@ const _mintCandyMachineToken = async (
   ];
   const metadataAddress = await Metadata.getPDA(mint.publicKey);
   const masterEdition = await MasterEdition.getPDA(mint.publicKey);
-  const [candyMachineCreator, creatorBump] = await _getCandyMachineCreator(
-    candyMachineAddress,
-  );
+  const [candyMachineCreator, creatorBump] = await _getCandyMachineCreator(candyMachineAddress);
   instructions.push(
     // @ts-ignore
     await candyMachineProgram.instruction.mintNft(creatorBump, {
@@ -167,24 +143,19 @@ const _mintCandyMachineToken = async (
         clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
         recentBlockhashes: anchor.web3.SYSVAR_RECENT_BLOCKHASHES_PUBKEY,
         instructionSysvarAccount: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-      }
+      },
     }),
   );
-  log.info("About to send transaction with all the candy instructions!")
+  log.info('About to send transaction with all the candy instructions!');
   // For now, just sending up one transaction; later on, if we add whitelist support,
-  // we'll need to send a few more transactions. 
-  const txid = await sendTransaction(
-    provider.connection,
-    recipientWalletAddress,
-    instructions,
-    signers,
-  )
-  log.info(`Sent transaction with id: ${txid} for mint: ${mint.publicKey.toString()}.`)
+  // we'll need to send a few more transactions.
+  const txid = await sendTransaction(provider.connection, recipientWalletAddress, instructions, signers);
+  log.info(`Sent transaction with id: ${txid} for mint: ${mint.publicKey.toString()}.`);
   return {
     txid,
-    mint
-  }
-}
+    mint,
+  };
+};
 
 const mintCandyMachineToken = async (
   provider: Provider,
@@ -192,28 +163,25 @@ const mintCandyMachineToken = async (
   recipientWalletAddress: Keypair,
 ) => {
   try {
-    const {txid, mint} = await _mintCandyMachineToken(provider, candyMachineAddress, recipientWalletAddress)
-    return new Promise(resolve => {
+    const { txid, mint } = await _mintCandyMachineToken(provider, candyMachineAddress, recipientWalletAddress);
+    return new Promise((resolve) => {
       provider.connection.onSignatureWithOptions(
         txid,
         async (notification, context) => {
-          log.info(`Got notification of type: ${notification.type} from txid: ${txid}.`)
+          log.info(`Got notification of type: ${notification.type} from txid: ${txid}.`);
           if (notification.type === 'status') {
             const { result } = notification;
             if (!result.err) {
-              resolve(mint.publicKey)
+              resolve(mint.publicKey);
             }
           }
         },
-        { commitment: 'processed' }
+        { commitment: 'processed' },
       );
-    })
+    });
   } catch (error: any) {
-    return { error, message: _getWarningMesssage(error) }
+    return { error, message: _getWarningMesssage(error) };
   }
-}
-
-export {
-  mintCandyMachineToken,
-  _getWarningMesssage
 };
+
+export { mintCandyMachineToken, _getWarningMesssage };
