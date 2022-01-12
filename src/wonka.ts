@@ -5,8 +5,8 @@ import {
   CANDY_MACHINE_PROGRAM_ID,
 } from './program-ids';
 import { web3 } from '@project-serum/anchor';
-import { getCandyMachineMints } from './metadata-utils';
-import { mintCandyMachineToken } from './minting-utils';
+import { getCandyMachineMints } from './utils/metadata-utils';
+import { mintCandyMachineToken } from './utils/minting-utils';
 
 export class Wonka {
   private _provider: Provider

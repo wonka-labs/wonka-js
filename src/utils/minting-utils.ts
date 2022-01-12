@@ -3,7 +3,7 @@ import { Program, Provider, web3 } from '@project-serum/anchor';
 import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js';
 import { Token } from '@solana/spl-token';
 import * as anchor from '@project-serum/anchor';
-import { sendTransactions } from './connection'
+import { sendTransaction } from './connection-utils'
 import {
   MintLayout,
   TOKEN_PROGRAM_ID,
@@ -16,7 +16,9 @@ import {
 import {
   CANDY_MACHINE_PROGRAM_ID,
   TOKEN_METADATA_PROGRAM_ID,
-} from './program-ids';
+} from '../program-ids';
+import assert from 'assert';
+import log from 'loglevel';
 
 const _getTokenWallet = async (wallet: PublicKey, mint: PublicKey) => {
   return (
@@ -93,6 +95,9 @@ const _mintCandyMachineToken = async (
   candyMachineAddress: PublicKey,
   recipientWalletAddress: Keypair,
 ) => {
+  assert(provider !== null, "Expecting a valid provider!")
+  assert(candyMachineAddress !== null, "Expecting a valid candy machine address!")
+  assert(recipientWalletAddress !== null, "Expecting a valid recipient address!")
   const mint = Keypair.generate();
   const candyMachineProgramIDL = await Program.fetchIdl(CANDY_MACHINE_PROGRAM_ID, provider);
   const candyMachineProgram = new Program(candyMachineProgramIDL!, CANDY_MACHINE_PROGRAM_ID, provider);
@@ -103,9 +108,7 @@ const _mintCandyMachineToken = async (
   const candyMachine: any = await candyMachineProgram.account.candyMachine.fetch(
     candyMachineAddress,
   );
-  const remainingAccounts: TransactionInstruction[] = [];
-  const signers: anchor.web3.Keypair[] = [mint];
-  const cleanupInstructions: TransactionInstruction[] = [];
+  const signers = [mint];
   const instructions = [
     anchor.web3.SystemProgram.createAccount({
       fromPubkey: recipientWalletAddress.publicKey,
@@ -144,7 +147,6 @@ const _mintCandyMachineToken = async (
   const [candyMachineCreator, creatorBump] = await _getCandyMachineCreator(
     candyMachineAddress,
   );
-
   instructions.push(
     // @ts-ignore
     await candyMachineProgram.instruction.mintNft(creatorBump, {
@@ -165,20 +167,23 @@ const _mintCandyMachineToken = async (
         clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
         recentBlockhashes: anchor.web3.SYSVAR_RECENT_BLOCKHASHES_PUBKEY,
         instructionSysvarAccount: anchor.web3.SYSVAR_INSTRUCTIONS_PUBKEY,
-      },
-      remainingAccounts:
-        remainingAccounts.length > 0 ? remainingAccounts : undefined,
+      }
     }),
   );
-
-  return (
-    await sendTransactions(
-      provider.connection,
-      recipientWalletAddress,
-      [instructions, cleanupInstructions],
-      [signers, []],
-    )
+  log.info("About to send transaction with all the candy instructions!")
+  // For now, just sending up one transaction; later on, if we add whitelist support,
+  // we'll need to send a few more transactions. 
+  const txid = await sendTransaction(
+    provider.connection,
+    recipientWalletAddress,
+    instructions,
+    signers,
   )
+  log.info(`Sent transaction with id: ${txid} for mint: ${mint.publicKey.toString()}.`)
+  return {
+    txid,
+    mint
+  }
 }
 
 const mintCandyMachineToken = async (
@@ -187,26 +192,24 @@ const mintCandyMachineToken = async (
   recipientWalletAddress: Keypair,
 ) => {
   try {
-    const txid = await _mintCandyMachineToken(provider, candyMachineAddress, recipientWalletAddress)
-    console.log(txid)
-    // return new Promise(resolve => {
-    //   provider.connection.onSignatureWithOptions(
-    //     txid,
-    //     async (notification, context) => {
-    //       if (notification.type === 'status') {
-    //         const { result } = notification;
-    //         if (!result.err) {
-
-    //           resolve(txid)
-    //         }
-    //       }
-    //     },
-    //     { commitment: 'processed' }
-    //   );
-    // })
+    const {txid, mint} = await _mintCandyMachineToken(provider, candyMachineAddress, recipientWalletAddress)
+    return new Promise(resolve => {
+      provider.connection.onSignatureWithOptions(
+        txid,
+        async (notification, context) => {
+          log.info(`Got notification of type: ${notification.type} from txid: ${txid}.`)
+          if (notification.type === 'status') {
+            const { result } = notification;
+            if (!result.err) {
+              resolve(mint.publicKey)
+            }
+          }
+        },
+        { commitment: 'processed' }
+      );
+    })
   } catch (error: any) {
-    const message = _getWarningMesssage(error)
-    return { error, message }
+    return { error, message: _getWarningMesssage(error) }
   }
 }
 
