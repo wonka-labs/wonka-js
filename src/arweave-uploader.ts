@@ -2,6 +2,11 @@ import Arweave from 'arweave';
 import { JWKInterface } from 'arweave/node/lib/wallet';
 import log from 'loglevel';
 
+/**
+ * Probably worth at one point to extract this out as a separate NPM.
+ * Specifically the purpose is to provide easy ways to upload specific 
+ * file types to Arweave i.e. PNG, JSON...
+ */
 export class ArweaveUploader {
   private _arweaveKey: JWKInterface;
   private _arweave:Arweave; 

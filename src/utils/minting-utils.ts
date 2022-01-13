@@ -184,4 +184,7 @@ const mintCandyMachineToken = async (
   }
 };
 
-export { mintCandyMachineToken, _getWarningMesssage };
+export { 
+  mintCandyMachineToken, 
+  _getWarningMesssage 
+};

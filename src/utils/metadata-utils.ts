@@ -54,13 +54,13 @@ const updateMintURI = async (
   wallet: Wallet, 
   mintKey: string, 
   mintURI: string,
-  context: any) => {
+  imageContext: any) => {
   let metadataData = await getMintMetadata(connection, mintKey)
   let metadataDataData = await fetch(metadataData.uri)
   let metadataDataDataJSON = await metadataDataData.json()
   metadataDataDataJSON.image = mintURI
   metadataDataDataJSON.properties.files[0].uri = mintURI
-  metadataDataDataJSON.context = context
+  metadataDataDataJSON.imageContext = imageContext
   const metadataDataDataJSONArweaveURI = await arweaveUploader.uploadJSON(metadataDataDataJSON)
   metadataData.uri = metadataDataDataJSONArweaveURI
   const txid = await actions.updateMetadata({
@@ -78,7 +78,7 @@ const updateMintURI = async (
         if (notification.type === 'status') {
           const { result } = notification;
           if (result.err) {
-            reject(txid);
+            reject({ txid, error: result.err });
           } else {
             resolve(txid)
           }
@@ -90,14 +90,14 @@ const updateMintURI = async (
 }
 
 const updateMintImage = async (
-  b64string: string,
+  b64image: string,
   connection: Connection, 
   arweaveUploader: ArweaveUploader,
   wallet: Wallet, 
-  mintKey: string,
-  context: any) => { 
-    const uri = await arweaveUploader.uploadBase64PNG(b64string)
-    return updateMintURI(connection, arweaveUploader, wallet, mintKey, uri, context)
+  mintAddress: string,
+  imageContext: any) => { 
+    const uri = await arweaveUploader.uploadBase64PNG(b64image)
+    return updateMintURI(connection, arweaveUploader, wallet, mintAddress, uri, imageContext)
 }
 
 export { 

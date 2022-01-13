@@ -2,8 +2,10 @@ import { Program, Provider } from '@project-serum/anchor';
 import { Keypair, PublicKey } from '@solana/web3.js';
 import { CANDY_MACHINE_PROGRAM_ID } from './program-ids';
 import { web3 } from '@project-serum/anchor';
-import { getCandyMachineMints, getMintMetadata } from './utils/metadata-utils';
+import { getCandyMachineMints, getMintMetadata, updateMintImage } from './utils/metadata-utils';
 import { mintCandyMachineToken } from './utils/minting-utils';
+import { Wallet } from '@metaplex/js';
+import { ArweaveUploader } from './arweave-uploader'
 
 export class Wonka {
   private _provider: Provider;
@@ -24,6 +26,19 @@ export class Wonka {
 
   public async getMintMetadata(mintAddress: string) {
     return await getMintMetadata(this._provider.connection, mintAddress)
+  }
+
+  public async updateMintImage(b64image: string,
+    arweaveUploader: ArweaveUploader,
+    wallet: Wallet, 
+    mintAddress: string,
+    imageContext: any) {
+    return await updateMintImage(b64image, 
+      this._provider.connection, 
+      arweaveUploader, 
+      wallet, 
+      mintAddress, 
+      imageContext)
   }
 
   public async getCandyMachineState() {
