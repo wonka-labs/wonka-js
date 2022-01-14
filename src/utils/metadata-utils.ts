@@ -55,9 +55,9 @@ const updateMintURI = async (
   mintKey: string, 
   mintURI: string,
   imageContext: any) => {
-  let metadataData = await getMintMetadata(connection, mintKey)
-  let metadataDataData = await fetch(metadataData.uri)
-  let metadataDataDataJSON = await metadataDataData.json()
+  const metadataData = await getMintMetadata(connection, mintKey)
+  const metadataDataData = await fetch(metadataData.uri)
+  const metadataDataDataJSON = await metadataDataData.json()
   metadataDataDataJSON.image = mintURI
   metadataDataDataJSON.properties.files[0].uri = mintURI
   metadataDataDataJSON.imageContext = imageContext

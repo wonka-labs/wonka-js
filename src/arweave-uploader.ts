@@ -22,7 +22,7 @@ export class ArweaveUploader {
 
   public async uploadJSON(json: any) {
     const buf = Buffer.from(JSON.stringify(json));
-    let transaction = await this._arweave.createTransaction({ data: buf }, this._arweaveKey);
+    const transaction = await this._arweave.createTransaction({ data: buf }, this._arweaveKey);
     transaction.addTag('Content-Type', 'application/json');
     await this._arweave.transactions.sign(transaction, this._arweaveKey);
     const response = await this._arweave.transactions.post(transaction);
@@ -40,7 +40,7 @@ export class ArweaveUploader {
     const arweaveWalletBallance = await this._arweave.wallets.getBalance(arweaveWallet);
 
     // #5 Core flow: create a transaction, upload and wait for the status! 
-    let transaction = await this._arweave.createTransaction({ data: buf }, this._arweaveKey);
+    const transaction = await this._arweave.createTransaction({ data: buf }, this._arweaveKey);
     transaction.addTag('Content-Type', 'image/png');
     await this._arweave.transactions.sign(transaction, this._arweaveKey);
     const response = await this._arweave.transactions.post(transaction);
