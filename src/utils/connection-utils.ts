@@ -1,22 +1,21 @@
-import { Keypair, Commitment, Connection, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { Provider } from '@project-serum/anchor';
+import { Keypair, Commitment, Connection, Transaction, TransactionInstruction, PublicKey } from '@solana/web3.js';
 
 const COMMITMENT_TYPE: Commitment = 'singleGossip';
- 
+
 export const sendTransaction = async (
-  connection: Connection,
-  wallet: any,
+  provider: Provider,
+  feePayer: PublicKey,
   instructions: TransactionInstruction[],
   signers: Keypair[],
 ) => {
   let transaction = new Transaction();
   instructions.forEach((instruction) => transaction.add(instruction));
-  transaction.recentBlockhash = (await connection.getRecentBlockhash(COMMITMENT_TYPE)).blockhash;
-  transaction.feePayer = wallet.publicKey;
+  transaction.recentBlockhash = (await provider.connection.getRecentBlockhash(COMMITMENT_TYPE)).blockhash;
+  transaction.feePayer = feePayer;
   transaction.partialSign(...signers);
-  transaction = await wallet.signTransaction(transaction);
-  const txid = await connection.sendRawTransaction(transaction.serialize(), {
+  return await provider.send(transaction, signers, {
     skipPreflight: true,
     preflightCommitment: COMMITMENT_TYPE,
   });
-  return txid;
 };

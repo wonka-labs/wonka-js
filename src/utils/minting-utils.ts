@@ -62,7 +62,7 @@ const _createAssociatedTokenAccountInstruction = (
 const _mintCandyMachineToken = async (
   provider: Provider,
   candyMachineAddress: PublicKey,
-  recipientWalletAddress: Keypair,
+  recipientWalletAddress: PublicKey,
 ) => {
   assert(provider !== null, 'Expecting a valid provider!');
   assert(candyMachineAddress !== null, 'Expecting a valid candy machine address!');
@@ -70,12 +70,12 @@ const _mintCandyMachineToken = async (
   const mint = Keypair.generate();
   const candyMachineProgramIDL = await Program.fetchIdl(CANDY_MACHINE_PROGRAM_ID, provider);
   const candyMachineProgram = new Program(candyMachineProgramIDL!, CANDY_MACHINE_PROGRAM_ID, provider);
-  const userTokenAccountAddress = await getTokenWallet(recipientWalletAddress.publicKey, mint.publicKey);
+  const userTokenAccountAddress = await getTokenWallet(recipientWalletAddress, mint.publicKey);
   const candyMachine: any = await candyMachineProgram.account.candyMachine.fetch(candyMachineAddress);
   const signers = [mint];
   const instructions = [
     anchor.web3.SystemProgram.createAccount({
-      fromPubkey: recipientWalletAddress.publicKey,
+      fromPubkey: recipientWalletAddress,
       newAccountPubkey: mint.publicKey,
       space: MintLayout.span,
       lamports: await candyMachineProgram.provider.connection.getMinimumBalanceForRentExemption(MintLayout.span),
@@ -85,20 +85,20 @@ const _mintCandyMachineToken = async (
       TOKEN_PROGRAM_ID,
       mint.publicKey,
       0,
-      recipientWalletAddress.publicKey,
-      recipientWalletAddress.publicKey,
+      recipientWalletAddress,
+      recipientWalletAddress,
     ),
     _createAssociatedTokenAccountInstruction(
       userTokenAccountAddress,
-      recipientWalletAddress.publicKey,
-      recipientWalletAddress.publicKey,
+      recipientWalletAddress,
+      recipientWalletAddress,
       mint.publicKey,
     ),
     Token.createMintToInstruction(
       TOKEN_PROGRAM_ID,
       mint.publicKey,
       userTokenAccountAddress,
-      recipientWalletAddress.publicKey,
+      recipientWalletAddress,
       [],
       1,
     ),
@@ -112,13 +112,13 @@ const _mintCandyMachineToken = async (
       accounts: {
         candyMachine: candyMachineAddress,
         candyMachineCreator,
-        payer: recipientWalletAddress.publicKey,
+        payer: recipientWalletAddress,
         wallet: candyMachine.wallet,
         mint: mint.publicKey,
         metadata: metadataAddress,
         masterEdition,
-        mintAuthority: recipientWalletAddress.publicKey,
-        updateAuthority: recipientWalletAddress.publicKey,
+        mintAuthority: recipientWalletAddress,
+        updateAuthority: recipientWalletAddress,
         tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: web3.SystemProgram.programId,
@@ -130,9 +130,7 @@ const _mintCandyMachineToken = async (
     }),
   );
   log.info('About to send transaction with all the candy instructions!');
-  // For now, just sending up one transaction; later on, if we add whitelist support,
-  // we'll need to send a few more transactions.
-  const txid = await sendTransaction(provider.connection, recipientWalletAddress, instructions, signers);
+  const txid = await sendTransaction(provider, recipientWalletAddress, instructions, signers);
   log.info(`Sent transaction with id: ${txid} for mint: ${mint.publicKey.toString()}.`);
   return {
     txid,
@@ -143,7 +141,7 @@ const _mintCandyMachineToken = async (
 const mintCandyMachineToken = async (
   provider: Provider,
   candyMachineAddress: PublicKey,
-  recipientWalletAddress: Keypair,
+  recipientWalletAddress: PublicKey,
 ) => {
   try {
     const { txid, mint } = await _mintCandyMachineToken(provider, candyMachineAddress, recipientWalletAddress);
@@ -155,7 +153,7 @@ const mintCandyMachineToken = async (
           if (notification.type === 'status') {
             const { result } = notification;
             if (!result.err) {
-              resolve(mint.publicKey);
+              resolve({ mintAddress: mint.publicKey });
             }
           }
         },

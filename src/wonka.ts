@@ -6,6 +6,9 @@ import { getCandyMachineMints, getMintMetadata, updateMintImage } from './utils/
 import { mintCandyMachineToken } from './utils/minting-utils';
 import { Wallet } from '@metaplex/js';
 import { ArweaveUploader } from './arweave-uploader'
+import log from 'loglevel';
+
+log.enableAll()
 
 export class Wonka {
   private _provider: Provider;
@@ -14,13 +17,14 @@ export class Wonka {
   public constructor(provider: Provider, candyMachineId: string) {
     this._provider = provider;
     this._candyMachineId = new web3.PublicKey(candyMachineId);
+    log.info(`Initialized a Wonka with candy machine ID: ${candyMachineId}.`)
   }
 
   public async getCandyMachineMints() {
     return await getCandyMachineMints(this._candyMachineId.toString(), this._provider.connection);
   }
 
-  public async mintCandyMachineToken(recipientWalletAddress: Keypair) {
+  public async mintCandyMachineToken(recipientWalletAddress: PublicKey) {
     return await mintCandyMachineToken(this._provider, this._candyMachineId, recipientWalletAddress);
   }
 
