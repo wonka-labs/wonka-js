@@ -1,31 +1,14 @@
 import { Program, Provider, web3 } from '@project-serum/anchor';
-import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js';
+import { PublicKey, Keypair } from '@solana/web3.js';
 import { Token } from '@solana/spl-token';
 import * as anchor from '@project-serum/anchor';
 import { sendTransaction } from './connection-utils';
 import { MintLayout, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Metadata, MasterEdition } from '@metaplex-foundation/mpl-token-metadata';
 import { CANDY_MACHINE_PROGRAM_ID, TOKEN_METADATA_PROGRAM_ID } from '../program-ids';
+import { getCandyMachineCreator, getTokenWallet } from "../utils/pda-utils"
 import assert from 'assert';
 import log from 'loglevel';
-
-const _getTokenWallet = async (wallet: PublicKey, mint: PublicKey) => {
-  return (
-    await web3.PublicKey.findProgramAddress(
-      [wallet.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mint.toBuffer()],
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-    )
-  )[0];
-};
-
-const _getCandyMachineCreator = async (
-  candyMachine: anchor.web3.PublicKey,
-): Promise<[anchor.web3.PublicKey, number]> => {
-  return await anchor.web3.PublicKey.findProgramAddress(
-    [Buffer.from('candy_machine'), candyMachine.toBuffer()],
-    CANDY_MACHINE_PROGRAM_ID,
-  );
-};
 
 const _getWarningMesssage = (error: any) => {
   if (error.msg) {
@@ -87,7 +70,7 @@ const _mintCandyMachineToken = async (
   const mint = Keypair.generate();
   const candyMachineProgramIDL = await Program.fetchIdl(CANDY_MACHINE_PROGRAM_ID, provider);
   const candyMachineProgram = new Program(candyMachineProgramIDL!, CANDY_MACHINE_PROGRAM_ID, provider);
-  const userTokenAccountAddress = await _getTokenWallet(recipientWalletAddress.publicKey, mint.publicKey);
+  const userTokenAccountAddress = await getTokenWallet(recipientWalletAddress.publicKey, mint.publicKey);
   const candyMachine: any = await candyMachineProgram.account.candyMachine.fetch(candyMachineAddress);
   const signers = [mint];
   const instructions = [
@@ -122,7 +105,7 @@ const _mintCandyMachineToken = async (
   ];
   const metadataAddress = await Metadata.getPDA(mint.publicKey);
   const masterEdition = await MasterEdition.getPDA(mint.publicKey);
-  const [candyMachineCreator, creatorBump] = await _getCandyMachineCreator(candyMachineAddress);
+  const [candyMachineCreator, creatorBump] = await getCandyMachineCreator(candyMachineAddress);
   instructions.push(
     // @ts-ignore
     await candyMachineProgram.instruction.mintNft(creatorBump, {

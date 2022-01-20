@@ -2,6 +2,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { Metadata, MetadataProgram, MetadataDataData } from '@metaplex-foundation/mpl-token-metadata';
 import { Wallet, actions} from '@metaplex/js';
 import { ArweaveUploader } from '../arweave-uploader';
+import {getCandyMachineCreator} from '../utils/pda-utils'
 import log from 'loglevel';
 
 const MAX_NAME_LENGTH = 32;
@@ -10,6 +11,7 @@ const MAX_SYMBOL_LENGTH = 10;
 const MAX_CREATOR_LEN = 32 + 1 + 1;
 
 const getCandyMachineMints = async (candyMachineId: string, connection: Connection) => {
+  const candyMachineCreatorId = (await getCandyMachineCreator(new PublicKey(candyMachineId)))[0].toString()
   const metadataAccounts = await MetadataProgram.getProgramAccounts(connection, {
     filters: [
       {
@@ -28,7 +30,7 @@ const getCandyMachineMints = async (candyMachineId: string, connection: Connecti
             1 +
             4 +
             0 * MAX_CREATOR_LEN,
-          bytes: candyMachineId,
+          bytes: candyMachineCreatorId,
         },
       },
     ],

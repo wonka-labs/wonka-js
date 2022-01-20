@@ -1,7 +1,7 @@
 import { Keypair, Commitment, Connection, Transaction, TransactionInstruction } from '@solana/web3.js';
 
 const COMMITMENT_TYPE: Commitment = 'singleGossip';
-
+ 
 export const sendTransaction = async (
   connection: Connection,
   wallet: any,
