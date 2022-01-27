@@ -7,7 +7,7 @@ export const sendTransaction = async (
   instructions: TransactionInstruction[],
   signers: Keypair[],
 ) => {
-  let transaction = new Transaction();
+  const transaction = new Transaction();
   instructions.forEach((instruction) => transaction.add(instruction));
   transaction.recentBlockhash = (await provider.connection.getRecentBlockhash()).blockhash;
   transaction.feePayer = feePayer;

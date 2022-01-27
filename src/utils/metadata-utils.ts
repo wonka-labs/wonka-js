@@ -5,8 +5,6 @@ import ArweaveUploader from '../arweave-uploader';
 import {getCandyMachineCreator} from '../utils/pda-utils'
 import log from 'loglevel';
 
-log.enableAll()
-
 const MAX_NAME_LENGTH = 32;
 const MAX_URI_LENGTH = 200;
 const MAX_SYMBOL_LENGTH = 10;
@@ -50,7 +48,6 @@ const getMintMetadata = async (connection: Connection, mintAddress: PublicKey): 
   const metadataPDA = await Metadata.getPDA(mintAddress);
   log.info(`Loading metadata PDA ${metadataPDA.toString()} for token address: ${mintAddress.toString()}.`)
   const metaData = await Metadata.load(connection, metadataPDA);
-  console.log(metaData.toString())
   return metaData.data.data as MetadataDataData
 }
 
