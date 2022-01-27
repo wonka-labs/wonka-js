@@ -142,7 +142,7 @@ const mintCandyMachineToken = async (
   provider: Provider,
   candyMachineAddress: PublicKey,
   recipientWalletAddress: PublicKey,
-) => {
+) : Promise<{txid?: string, mintAddress?: PublicKey, error?: any, errorMessage?: string }> => {
   try {
     const { txid, mint } = await _mintCandyMachineToken(provider, candyMachineAddress, recipientWalletAddress);
     return new Promise((resolve) => {
@@ -153,15 +153,15 @@ const mintCandyMachineToken = async (
           if (notification.type === 'status') {
             const { result } = notification;
             if (!result.err) {
-              resolve({ mintAddress: mint.publicKey });
+              resolve({ txid, mintAddress: mint.publicKey });
             }
           }
         },
         { commitment: 'processed' },
       );
     });
-  } catch (error: any) {
-    return { error, message: _getWarningMesssage(error) };
+  } catch (error) {
+    return { error, errorMessage: _getWarningMesssage(error) };
   }
 };
 

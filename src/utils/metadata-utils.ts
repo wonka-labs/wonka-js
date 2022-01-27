@@ -1,9 +1,11 @@
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, TransactionError } from '@solana/web3.js';
 import { Metadata, MetadataProgram, MetadataDataData } from '@metaplex-foundation/mpl-token-metadata';
 import { Wallet, actions} from '@metaplex/js';
-import { ArweaveUploader } from '../arweave-uploader';
+import ArweaveUploader from '../arweave-uploader';
 import {getCandyMachineCreator} from '../utils/pda-utils'
 import log from 'loglevel';
+
+log.enableAll()
 
 const MAX_NAME_LENGTH = 32;
 const MAX_URI_LENGTH = 200;
@@ -44,9 +46,11 @@ const getCandyMachineMints = async (candyMachineId: string, connection: Connecti
   );
 };
 
-const getMintMetadata = async (connection: Connection, mintAddress: string): Promise<MetadataDataData> => {
+const getMintMetadata = async (connection: Connection, mintAddress: PublicKey): Promise<MetadataDataData> => {
   const metadataPDA = await Metadata.getPDA(mintAddress);
+  log.info(`Loading metadata PDA ${metadataPDA.toString()} for token address: ${mintAddress.toString()}.`)
   const metaData = await Metadata.load(connection, metadataPDA);
+  console.log(metaData.toString())
   return metaData.data.data as MetadataDataData
 }
 
@@ -54,9 +58,9 @@ const updateMintURI = async (
   connection: Connection, 
   arweaveUploader: ArweaveUploader,
   wallet: Wallet, 
-  mintKey: string, 
+  mintKey: PublicKey, 
   mintURI: string,
-  imageContext: any) => {
+  imageContext: any): Promise <{txid: string, error?: TransactionError}> => {
   const metadataData = await getMintMetadata(connection, mintKey)
   const metadataDataData = await fetch(metadataData.uri)
   const metadataDataDataJSON = await metadataDataData.json()
@@ -82,7 +86,7 @@ const updateMintURI = async (
           if (result.err) {
             reject({ txid, error: result.err });
           } else {
-            resolve(txid)
+            resolve({ txid });
           }
         }
       },
@@ -96,10 +100,11 @@ const updateMintImage = async (
   connection: Connection, 
   arweaveUploader: ArweaveUploader,
   wallet: Wallet, 
-  mintAddress: string,
+  mintAddress: PublicKey,
   imageContext: any) => { 
     const uri = await arweaveUploader.uploadBase64PNG(b64image)
-    return updateMintURI(connection, arweaveUploader, wallet, mintAddress, uri, imageContext)
+    log.info(`Uploaded base64 image to arweave, here is the url: ${uri}`)
+    return await updateMintURI(connection, arweaveUploader, wallet, mintAddress, uri, imageContext)
 }
 
 export { 

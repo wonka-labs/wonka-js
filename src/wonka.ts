@@ -1,16 +1,16 @@
 import { Program, Provider } from '@project-serum/anchor';
-import { Keypair, PublicKey } from '@solana/web3.js';
+import { PublicKey, Connection} from '@solana/web3.js';
 import { CANDY_MACHINE_PROGRAM_ID } from './program-ids';
 import { web3 } from '@project-serum/anchor';
 import { getCandyMachineMints, getMintMetadata, updateMintImage } from './utils/metadata-utils';
 import { mintCandyMachineToken } from './utils/minting-utils';
 import { Wallet } from '@metaplex/js';
-import { ArweaveUploader } from './arweave-uploader'
+import ArweaveUploader from './arweave-uploader'
 import log from 'loglevel';
 
 log.enableAll()
 
-export class Wonka {
+export default class Wonka {
   private _provider: Provider;
   private _candyMachineId: PublicKey;
 
@@ -28,14 +28,18 @@ export class Wonka {
     return await mintCandyMachineToken(this._provider, this._candyMachineId, recipientWalletAddress);
   }
 
-  public async getMintMetadata(mintAddress: string) {
+  public async getMintMetadata(mintAddress: PublicKey) {
     return await getMintMetadata(this._provider.connection, mintAddress)
+  }
+
+  public static async getMintMetadata(connection: Connection, mintAddress: PublicKey) {
+    return await getMintMetadata(connection, mintAddress)
   }
 
   public async updateMintImage(b64image: string,
     arweaveUploader: ArweaveUploader,
     wallet: Wallet, 
-    mintAddress: string,
+    mintAddress: PublicKey,
     imageContext: any) {
     return await updateMintImage(b64image, 
       this._provider.connection, 

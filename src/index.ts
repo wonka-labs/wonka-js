@@ -1,9 +1,9 @@
-import { Wonka } from './wonka';
-import {ArweaveUploader} from './arweave-uploader';
-import { connectProvider } from './utils/provider-utils'
+import Wonka from './wonka';
+import ArweaveUploader from './arweave-uploader';
+
+export default Wonka;
 
 export { 
   Wonka, 
-  ArweaveUploader,
-  connectProvider
+  ArweaveUploader
 };

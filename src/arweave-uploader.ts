@@ -2,14 +2,22 @@ import Arweave from 'arweave';
 import { JWKInterface } from 'arweave/node/lib/wallet';
 import log from 'loglevel';
 
+export function _sanitizeB64String(b64string: string) {
+  const pngHTMLB64StringPrefix = "data:image/png;base64,"
+  if (b64string.startsWith(pngHTMLB64StringPrefix)) {
+    return b64string.slice(pngHTMLB64StringPrefix.length).trim()
+  }
+  return b64string
+}
+
 /**
  * Probably worth at one point to extract this out as a separate NPM.
  * Specifically the purpose is to provide easy ways to upload specific 
  * file types to Arweave i.e. PNG, JSON...
  */
-export class ArweaveUploader {
+export default class ArweaveUploader {
   private _arweaveKey: JWKInterface;
-  private _arweave:Arweave; 
+  private _arweave: Arweave; 
 
   public constructor(arweaveKey: string) {
     this._arweaveKey = JSON.parse(arweaveKey) as JWKInterface
@@ -33,12 +41,12 @@ export class ArweaveUploader {
 
   public async uploadBase64PNG(b64string: string) {
     // #1 Convert base64 string to a binary data buffer.
-    const buf = Buffer.from(b64string, 'base64');
+    const buf = Buffer.from(_sanitizeB64String(b64string), 'base64');
 
     // #4 Check out wallet balance. We should probably fail if too low? 
     const arweaveWallet = await this._arweave.wallets.jwkToAddress(this._arweaveKey);
     const arweaveWalletBallance = await this._arweave.wallets.getBalance(arweaveWallet);
-
+    
     // #5 Core flow: create a transaction, upload and wait for the status! 
     const transaction = await this._arweave.createTransaction({ data: buf }, this._arweaveKey);
     transaction.addTag('Content-Type', 'image/png');
