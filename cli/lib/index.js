@@ -51,6 +51,27 @@ programCommand('get-metadata')
     prettyPrint(`Fetched metadata for mint: ${mint}:`, mintMetadata);
     prettyPrint(`Fetched metadata URI data for mint: ${mint}:`, metadataDataURIDataJSON);
 }));
+programCommand('mint')
+    .option('-cmid, --candy-machine-id <string>', 'Candy Machine ID.')
+    .option('-r, --recipient <string>', 'base58 recipient public address')
+    .action((_, cmd) => __awaiter(void 0, void 0, void 0, function* () {
+    const { keypair, env, candyMachineId, recipient } = cmd.opts();
+    const wonka = wonkaWithCommandOptions(keypair, env, candyMachineId);
+    const recipientWalletAddress = new web3_js_1.PublicKey(recipient);
+    const { mintAddress, txid, error, errorMessage } = yield wonka.mintCandyMachineToken(recipientWalletAddress);
+    if (error) {
+        prettyPrint('Failed to mint with error:', error);
+        prettyPrint('Transaction id: ', txid);
+        prettyPrint('Error message: ', errorMessage);
+    }
+    else {
+        console.log(`Minted ${mintAddress}; waiting 30 seconds to fetch metadata...`);
+        setTimeout(() => __awaiter(void 0, void 0, void 0, function* () {
+            const mintMetadata = yield wonka.getMintMetadata(mintAddress);
+            prettyPrint(`Minted a new token: ${mintAddress}:`, mintMetadata);
+        }), 30 * 1000);
+    }
+}));
 function wonkaWithCommandOptions(keypairFile, env, candyMachineId) {
     const connection = new web3_js_1.Connection((0, web3_js_1.clusterApiUrl)(env));
     const loadedKeypair = loadKeypair(keypairFile);
