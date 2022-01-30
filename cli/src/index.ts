@@ -105,7 +105,7 @@ function setLogLevel(value) {
 
 function prettyPrint(description: string, obj: any) {
   console.log(description);
-  console.log(util.inspect(obj, { colors: true, depth: 4 }));
+  console.log(util.inspect(obj, { colors: true, depth: 6 }));
 }
 
 program.parse(process.argv);
