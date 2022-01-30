@@ -25,7 +25,7 @@ const getCandyMachineState = async () => {
   const candyMachineId = process.env.REACT_APP_CANDY_MACHINE_ID!;
   const wonka = new Wonka(provider, candyMachineId)
   const candyMachineState = await wonka.getCandyMachineState()
-  console.log(`${JSON.stringify(candyMachineState)}`)
+  console.log(candyMachineState)
 }
 ```
 
@@ -47,12 +47,10 @@ const getCandyMachineMints = async() => {
 Mints an NFT; you either get an error with a message or the ID of the mint in return. 
 
 ```JS
-const mintCandyMachineToken = async(recipientWallet: Keypair) => {
-  console.log("Minting a new candy machine token...")
+const mintCandyMachineToken = async(recipientWallet: PublicKey) => {
   const provider = ...;
   const candyMachineId = process.env.REACT_APP_CANDY_MACHINE_ID!;
   const wonka = new Wonka(provider, candyMachineId)
-  // For now, pass in window.solana as recipientWallet once connected; will decouple soon.
   const candyMachineMintId = await wonka.mintCandyMachineToken(recipientWallet)
   console.log(candyMachineMintId)
 }
@@ -63,17 +61,18 @@ Sometimes you need to load one particular NFT's metadata, here is how you can do
 
 ```JS
 const getMintMetadata = async(mintAddress: string) => {
-  console.log("Getting mint metadata...")
   const provider = ...;
   const candyMachineId = process.env.REACT_APP_CANDY_MACHINE_ID!;
   const wonka = new Wonka(provider, candyMachineId)
   const mintMetadata = await wonka.getMintMetadata(mintAddress)
-  console.log(`Fetched mint metadata: ${JSON.stringify(mintMetadata)}`)
+  console.log(`Fetched mint metadata:`);
+  console.log(mintMetadata);
   
   // Can also fetch the data stored inside the metadata:
   const metadataDataURIData = await fetch(mintMetadata.uri);
   const metadataDataURIDataJSON = await metadataDataURIData.json();
-  console.log(`Fetched mint metadata's URI data: ${JSON.stringify(metadataDataURIDataJSON)}`)
+  console.log(`Fetched mint metadata's URI data:`);
+  console.log(metadataDataURIDataJSON);
 }
 ```
 
@@ -87,7 +86,7 @@ Here is what's happening at a high-level:
 3. You give Wonka a base64 encoded PNG and a mint address. That's it! 
 
 ```JS
-const updateMintImage = async(mintAddress: string, b64image: string) => {
+const updateMintImage = async(mintAddress: PublicKey, b64image: string) => {
   console.log("Getting mint metadata...")
   const provider = ...;
   const candyMachineId = process.env.REACT_APP_CANDY_MACHINE_ID!;
