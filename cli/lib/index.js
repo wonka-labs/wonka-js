@@ -37,6 +37,31 @@ programCommand('mints')
     const mints = yield wonka.getCandyMachineMints();
     console.log(mints);
 }));
+programCommand('get-mints')
+    .option('-cmid, --candy-machine-id <string>', 'Candy Machine ID.')
+    .action((_, cmd) => __awaiter(void 0, void 0, void 0, function* () {
+    const { keypair, env, candyMachineId } = cmd.opts();
+    const wonka = wonkaWithCommandOptions(keypair, env, candyMachineId);
+    const mints = yield wonka.getCandyMachineMints();
+    console.log(mints);
+}));
+programCommand('get-state')
+    .option('-cmid, --candy-machine-id <string>', 'Candy Machine ID.')
+    .action((_, cmd) => __awaiter(void 0, void 0, void 0, function* () {
+    const { keypair, env, candyMachineId } = cmd.opts();
+    const wonka = wonkaWithCommandOptions(keypair, env, candyMachineId);
+    const state = yield wonka.getCandyMachineState();
+    console.log(state);
+}));
+function wonkaWithCommandOptions(keypairFile, env, candyMachineId) {
+    const connection = new web3_js_2.Connection((0, web3_js_1.clusterApiUrl)(env));
+    const loadedKeypair = loadKeypair(keypairFile);
+    const payerWallet = new anchor_1.Wallet(loadedKeypair);
+    const provider = new anchor_1.Provider(connection, payerWallet, {
+        commitment: 'processed',
+    });
+    return new wonka_1.default(provider, candyMachineId);
+}
 function loadKeypair(keypairFile) {
     if (!keypairFile || keypairFile == '') {
         throw new Error('Keypair is required!');
