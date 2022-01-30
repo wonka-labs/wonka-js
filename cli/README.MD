@@ -6,7 +6,7 @@ The CLI comes in handy both as a tool to debug your candy machine as well as an 
 1. Install `node`
 2. Instsall `npm`
 3. Install `ts-node` 
-4. [Setup a devnet wallet](https://docs.metaplex.com/candy-machine-v2/getting-started#setting-up-a-devnet-wallet-for-testing); key is usually saved in, `~/.config/solana/devnet.json`)
+4. [Setup a devnet wallet](https://docs.metaplex.com/candy-machine-v2/getting-started#setting-up-a-devnet-wallet-for-testing) (key in examples below is saved in `~/.config/solana/devnet.json`).
 5. [Create a candy machine](https://docs.metaplex.com/candy-machine-v2/creating-candy-machine).
 
 ## Installation
@@ -18,10 +18,10 @@ The CLI comes in handy both as a tool to debug your candy machine as well as an 
 
 ## Commands
 Quick summary of the commands below:
-* `get-state`: prints out current candy machine's state. 
-* `get-mints`: prints out all existing mints from a particular candy machine. 
-* `get-metadata`: prints out all metadata associated with a candy machine mint. 
-* `mint`: mints a new NFT and gives it to a recipient address.
+* [`get-state`](#getting-machine-state): prints out current candy machine's state. 
+* [`get-mints`](#getting-existing-mints): prints out all existing mints from a particular candy machine. 
+* [`mint`](#minting-a-new-nft): mints a new NFT and gives it to a recipient address.
+* [`get-metadata`](#fetching-mint-metadata): prints out all metadata associated with a candy machine mint. 
 
 ### Getting Machine State 
 Returns info about currently available mints in Candy Machine, how many were already minted, how long is left for the auction, etc. 
@@ -192,5 +192,3 @@ Fetched metadata URI data for mint: 9iTKkg9JuzoNZePjgfd1XxXcKQL9e1c4Zkf2pbDTj7eW
   }
 }
 ```
-
-### Storing Ids & Keys
