@@ -1,30 +1,14 @@
 import { program } from 'commander';
 import log from 'loglevel';
-import { clusterApiUrl, Cluster } from '@solana/web3.js';
+import util from 'util';
+import { clusterApiUrl, Cluster, PublicKey, Connection, Keypair } from '@solana/web3.js';
 import Wonka from '@triton-labs/wonka';
 import fs from 'fs';
-import { Connection } from '@solana/web3.js';
 import { Provider, Wallet } from '@project-serum/anchor';
-import { Keypair } from '@solana/web3.js';
+import fetch from 'node-fetch';
 
 program.version('1.1.0');
 log.setLevel('info');
-programCommand('mints')
-  .option('-cmid, --candy-machine-id <string>', 'Candy Machine ID.')
-  .action(async (directory, cmd) => {
-    const { keypair, env, candyMachineId } = cmd.opts();
-    const connection = new Connection(clusterApiUrl(env));
-    const loadedKeypair = loadKeypair(keypair);
-    const payerWallet = new Wallet(loadedKeypair);
-    const provider = new Provider(connection, payerWallet, {
-      commitment: 'processed',
-    });
-
-    console.log(candyMachineId);
-    const wonka = new Wonka(provider, candyMachineId);
-    const mints = await wonka.getCandyMachineMints();
-    console.log(mints);
-  });
 
 programCommand('get-mints')
   .option('-cmid, --candy-machine-id <string>', 'Candy Machine ID.')
@@ -32,7 +16,7 @@ programCommand('get-mints')
     const { keypair, env, candyMachineId } = cmd.opts();
     const wonka = wonkaWithCommandOptions(keypair, env, candyMachineId);
     const mints = await wonka.getCandyMachineMints();
-    console.log(mints);
+    prettyPrint(`Fetched all mints from candy machine: ${candyMachineId}:`, mints)
   });
 
 programCommand('get-state')
@@ -41,7 +25,21 @@ programCommand('get-state')
     const { keypair, env, candyMachineId } = cmd.opts();
     const wonka = wonkaWithCommandOptions(keypair, env, candyMachineId);
     const state = await wonka.getCandyMachineState();
-    console.log(state);
+    prettyPrint(`Fetched state for candy machine: ${candyMachineId}:`, state)
+  });
+
+programCommand('get-metadata')
+  .option('-cmid, --candy-machine-id <string>', 'Candy Machine ID.')
+  .option('-m, --mint <string>', 'base58 mint key')
+  .action(async (_, cmd) => {
+    const { keypair, env, candyMachineId, mint } = cmd.opts();
+    const wonka = wonkaWithCommandOptions(keypair, env, candyMachineId);
+    const mintAddress = new PublicKey(mint);
+    const mintMetadata = await wonka.getMintMetadata(mintAddress);
+    const metadataDataURIData = await fetch(mintMetadata.uri);
+    const metadataDataURIDataJSON = await metadataDataURIData.json();
+    prettyPrint(`Fetched metadata for mint: ${mint}:`, mintMetadata)
+    prettyPrint(`Fetched metadata URI data for mint: ${mint}:`, metadataDataURIDataJSON)
   });
 
 function wonkaWithCommandOptions(keypairFile: string, env: Cluster, candyMachineId: string): Wonka {
@@ -82,6 +80,11 @@ function setLogLevel(value) {
   }
   log.info('setting the log value to: ' + value);
   log.setLevel(value);
+}
+
+function prettyPrint(description: string, obj: any) {
+  console.log(description)
+  console.log(util.inspect(obj, {colors: true, depth: 4}))
 }
 
 program.parse(process.argv);
