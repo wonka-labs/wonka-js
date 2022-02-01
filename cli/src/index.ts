@@ -55,7 +55,7 @@ programCommand('mint')
       prettyPrint('Transaction id: ', txid);
       prettyPrint('Error message: ', errorMessage);
     } else {
-      console.log(`Minted ${mintAddress!}; waiting 30 seconds to fetch metadata...`);
+      log.info(`Minted ${mintAddress!}; waiting 30 seconds to fetch metadata...`);
       setTimeout(async () => {
         const mintMetadata = await wonka.getMintMetadata(mintAddress!);
         prettyPrint(`Minted a new token: ${mintAddress}:`, mintMetadata);
@@ -74,7 +74,7 @@ function wonkaWithCommandOptions(keypairFile: string, env: Cluster, candyMachine
 }
 
 function loadKeypair(keypairFile): Keypair {
-  if (!keypairFile || keypairFile == '') {
+  if (!keypairFile || keypairFile === '') {
     throw new Error('Keypair is required!');
   }
   const keypair = Keypair.fromSecretKey(new Uint8Array(JSON.parse(fs.readFileSync(keypairFile).toString())));
@@ -88,7 +88,7 @@ function programCommand(name: string) {
     .option(
       '-e, --env <string>',
       'Solana cluster env name',
-      'devnet', //mainnet-beta, testnet, devnet
+      'devnet', // mainnet-beta, testnet, devnet
     )
     .option('-k, --keypair <path>', `Solana wallet location`, '--keypair not provided')
     .option('-l, --log-level <string>', 'log level', setLogLevel);
@@ -104,8 +104,8 @@ function setLogLevel(value) {
 }
 
 function prettyPrint(description: string, obj: any) {
-  console.log(description);
-  console.log(util.inspect(obj, { colors: true, depth: 6 }));
+  log.info(description);
+  log.info(util.inspect(obj, { colors: true, depth: 6 }));
 }
 
 program.parse(process.argv);
