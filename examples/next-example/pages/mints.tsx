@@ -31,7 +31,7 @@ const CandyMachineState = ({ candyMachineState }: { candyMachineState: CandyMach
   );
 };
 
-const StatePage: NextPage = () => {
+const Mints: NextPage = () => {
   // State:
   const [wonka, setWonka] = useState<Wonka | null>(null);
   const [candyMachineState, setCandyMachineState] = useState<CandyMachineState>();
@@ -78,4 +78,4 @@ const StatePage: NextPage = () => {
   );
 };
 
-export default StatePage;
+export default Mints;

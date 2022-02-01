@@ -13,13 +13,13 @@ const Home: NextPage = () => {
         </p>
         <ul className="list-disc px-10">
           <li>
+            <code>getCandyMachineState(..)</code>
+          </li>
+          <li>
             <code>mintCandyMachineToken(..)</code>
           </li>
           <li>
             <code>getCandyMachineMints(..)</code>
-          </li>
-          <li>
-            <code>getCandyMachineState(..)</code>
           </li>
           <li>
             <code>getMintMetadata(..)</code>
@@ -30,9 +30,9 @@ const Home: NextPage = () => {
           <a href="https://github.com/solana-labs/wallet-adapter">wallet adapter</a> from Solana Labs below, but you can
           also write you own.
         </p>
-        <p className="text-center">
+        <div className="text-center">
           <WalletMultiButton />
-        </p>
+        </div>
       </div>
     </div>
   );
