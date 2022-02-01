@@ -18,8 +18,8 @@ import { clusterApiUrl } from "@solana/web3.js";
 import { AppProps } from "next/app";
 import { FC, useMemo } from "react";
 
-require("@solana/wallet-adapter-react-ui/styles.css");
 require("../styles/globals.css");
+require("@solana/wallet-adapter-react-ui/styles.css");
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   const network = WalletAdapterNetwork.Devnet;
