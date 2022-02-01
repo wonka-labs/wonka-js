@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -65,7 +66,7 @@ programCommand('mint')
         prettyPrint('Error message: ', errorMessage);
     }
     else {
-        console.log(`Minted ${mintAddress}; waiting 30 seconds to fetch metadata...`);
+        loglevel_1.default.info(`Minted ${mintAddress}; waiting 30 seconds to fetch metadata...`);
         setTimeout(() => __awaiter(void 0, void 0, void 0, function* () {
             const mintMetadata = yield wonka.getMintMetadata(mintAddress);
             prettyPrint(`Minted a new token: ${mintAddress}:`, mintMetadata);
@@ -82,7 +83,7 @@ function wonkaWithCommandOptions(keypairFile, env, candyMachineId) {
     return new wonka_1.default(provider, candyMachineId);
 }
 function loadKeypair(keypairFile) {
-    if (!keypairFile || keypairFile == '') {
+    if (!keypairFile || keypairFile === '') {
         throw new Error('Keypair is required!');
     }
     const keypair = web3_js_1.Keypair.fromSecretKey(new Uint8Array(JSON.parse(fs_1.default.readFileSync(keypairFile).toString())));
@@ -105,8 +106,8 @@ function setLogLevel(value) {
     loglevel_1.default.setLevel(value);
 }
 function prettyPrint(description, obj) {
-    console.log(description);
-    console.log(util_1.default.inspect(obj, { colors: true, depth: 6 }));
+    loglevel_1.default.info(description);
+    loglevel_1.default.info(util_1.default.inspect(obj, { colors: true, depth: 6 }));
 }
 commander_1.program.parse(process.argv);
 //# sourceMappingURL=index.js.map
