@@ -10,7 +10,7 @@ const MAX_URI_LENGTH = 200;
 const MAX_SYMBOL_LENGTH = 10;
 const MAX_CREATOR_LEN = 32 + 1 + 1;
 
-const getCandyMachineMints = async (candyMachineId: string, connection: Connection) => {
+const getCandyMachineMints = async (candyMachineId: string, connection: Connection): Promise<Metadata[]> => {
   const candyMachineCreatorId = (await getCandyMachineCreator(new PublicKey(candyMachineId)))[0].toString()
   const metadataAccounts = await MetadataProgram.getProgramAccounts(connection, {
     filters: [

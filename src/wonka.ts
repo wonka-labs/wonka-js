@@ -7,6 +7,7 @@ import { mintCandyMachineToken } from './utils/minting-utils';
 import { Wallet } from '@metaplex/js';
 import ArweaveUploader from './arweave-uploader'
 import log from 'loglevel';
+import { Metadata, MetadataDataData } from '@metaplex-foundation/mpl-token-metadata';
 
 export interface CandyMachineState {
   itemsAvailable: number,
@@ -25,7 +26,7 @@ export default class Wonka {
     log.info(`Initialized a Wonka with candy machine ID: ${candyMachineId}.`)
   }
 
-  public async getCandyMachineMints() {
+  public async getCandyMachineMints(): Promise<Metadata[]> {
     return await getCandyMachineMints(this._candyMachineId.toString(), this._provider.connection);
   }
 
@@ -33,10 +34,10 @@ export default class Wonka {
     return await mintCandyMachineToken(this._provider, this._candyMachineId, recipientWalletAddress);
   }
 
-  public async getMintMetadata(mintAddress: PublicKey) {
+  public async getMintMetadata(mintAddress: PublicKey): Promise<MetadataDataData> {
     return await getMintMetadata(this._provider.connection, mintAddress)
   }
-
+  
   public static async getMintMetadata(connection: Connection, mintAddress: PublicKey) {
     return await getMintMetadata(connection, mintAddress)
   }
