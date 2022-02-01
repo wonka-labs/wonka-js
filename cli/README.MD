@@ -2,6 +2,9 @@
 
 The CLI comes in handy both as a tool to debug your candy machine as well as an easy way to test out the JS APIs. If you want to contribute, see [Installing from Source](#installing-from-source) 🙏.
 
+![wonka-cli](https://user-images.githubusercontent.com/796815/152068325-b2581ffe-51ad-4d8b-8815-e8ac3a0eda36.png)
+
+
 ## Prerequisites
 1. Install `node` and `npm`
 2. [Setup a devnet wallet](https://docs.metaplex.com/candy-machine-v2/getting-started#setting-up-a-devnet-wallet-for-testing) — in examples below the key is saved in `~/.config/solana/devnet.json`.
