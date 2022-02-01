@@ -1,20 +1,16 @@
 # Wonka JS: Command Line Interface (CLI)
 
-The CLI comes in handy both as a tool to debug your candy machine as well as an easy way to test out the JS APIs. 
+The CLI comes in handy both as a tool to debug your candy machine as well as an easy way to test out the JS APIs. If you want to contribute, see [Installing from Source](#installing-from-source) 🙏.
 
 ## Prerequisites
-1. Install `node`
-2. Instsall `npm`
-3. Install `ts-node` 
-4. [Setup a devnet wallet](https://docs.metaplex.com/candy-machine-v2/getting-started#setting-up-a-devnet-wallet-for-testing) (key in examples below is saved in `~/.config/solana/devnet.json`).
-5. [Create a candy machine](https://docs.metaplex.com/candy-machine-v2/creating-candy-machine).
+1. Install `node` and `npm`
+2. [Setup a devnet wallet](https://docs.metaplex.com/candy-machine-v2/getting-started#setting-up-a-devnet-wallet-for-testing) — in examples below the key is saved in `~/.config/solana/devnet.json`.
+3. [Create a candy machine](https://docs.metaplex.com/candy-machine-v2/creating-candy-machine) — save the candy machine ID somewhere handy to use in the commands.
 
-## Installation
-1. `mkdir ~/triton-labs`
-2. `cd ~/triton-labs`
-3. `git clone git@github.com:TritonLabs/wonka.git` 
-4. `cd wonka/cli` 
-5. `npm i`
+## Installing 
+```
+npm -g @triton-labs/wonka-cli
+```
 
 ## Commands
 Quick summary of the commands below:
@@ -27,9 +23,7 @@ Quick summary of the commands below:
 Returns info about currently available mints in Candy Machine, how many were already minted, how long is left for the auction, etc. 
 
 ```JS
-➜ cli git:(main) ts-node src/index.ts get-state \
--k ~/.config/solana/devnet.json \
--cmid Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb
+➜ wonka-cli get-state -k ~/.config/solana/devnet.json -cmid Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb
 
 Loaded keypair with public key: 6zsuBDfuvtxK5FD9tf8u8LfrYBVnxDWRhj43snmC6Qx6.
 Initialized a Wonka with candy machine ID: Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb.
@@ -47,9 +41,7 @@ Fetched state for candy machine: Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb:
 Returns a list of all existing mints on the given candy machine. 
 
 ```JS
-➜ cli git:(main) ts-node src/index.ts get-mints \
--k ~/.config/solana/devnet.json \
--cmid Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb
+➜ wonka-cli get-mints -k ~/.config/solana/devnet.json -cmid Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb
 
 Loaded keypair with public key: 6zsuBDfuvtxK5FD9tf8u8LfrYBVnxDWRhj43snmC6Qx6.
 Initialized a Wonka with candy machine ID: Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb.
@@ -106,7 +98,7 @@ Fetched all mints from candy machine: Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaH
 Mints an NFT; you either get an error with a message or the ID of the mint in return. 
 
 ```JS
-➜ cli git:(main) ✗ ts-node src/index.ts mint \
+➜ wonka-cli mint \
 -k ~/.config/solana/devnet.json \
 -cmid Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb \
 -r 6zsuBDfuvtxK5FD9tf8u8LfrYBVnxDWRhj43snmC6Qx6
@@ -143,7 +135,7 @@ MetadataDataData {
 Sometimes you need to load one particular NFT's metadata, here is how you can do it:
 
 ```JS
-➜ cli git:(main) ✗ ts-node src/index.ts get-metadata \
+➜ wonka-cli get-metadata \
 -k ~/.config/solana/devnet.json \
 -cmid Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb \
 -m 9iTKkg9JuzoNZePjgfd1XxXcKQL9e1c4Zkf2pbDTj7eW
@@ -192,3 +184,24 @@ Fetched metadata URI data for mint: 9iTKkg9JuzoNZePjgfd1XxXcKQL9e1c4Zkf2pbDTj7eW
   }
 }
 ```
+
+## Installing from Source
+1. `mkdir ~/triton-labs`
+2. `cd ~/triton-labs`
+3. `git clone git@github.com:TritonLabs/wonka.git` 
+4. `cd wonka/cli` 
+5. `npm i`
+6. `npm build` 
+
+You can now run the command either through `ts-node` or compile with `tsc` and then run with `node`. If you're actively developing, running `tsc --watch` would autocompile on save. Here is an example:
+
+```
+➜ cli git:(main) ts-node src/index.ts get-mints -k ~/.config/solana/devnet.json -cmid Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb
+```
+
+or after compiling:
+
+```
+➜ cli git:(main) tsc
+➜ cli git:(main) node lib/index.js get-mints -k ~/.config/solana/devnet.json -cmid Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb
+
