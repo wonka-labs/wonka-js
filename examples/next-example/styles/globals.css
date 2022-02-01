@@ -16,6 +16,11 @@ a {
   @apply py-2
 }
 
-a {
+a, button {
   text-decoration: underline;
+}
+
+code {
+  background-color: rgba(249, 249, 249, 0.3);
+  font-family: monospace;
 }

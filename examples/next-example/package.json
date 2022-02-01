@@ -8,14 +8,19 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@metaplex-foundation/mpl-token-metadata": "^1.1.0",
+    "@metaplex/js": "^4.10.0",
     "@solana/wallet-adapter-base": "^0.9.2",
     "@solana/wallet-adapter-react": "^0.15.2",
     "@solana/wallet-adapter-react-ui": "^0.9.4",
     "@solana/wallet-adapter-wallets": "^0.14.2",
     "@solana/web3.js": "^1.32.0",
+    "@triton-labs/wonka": "~/Desktop/wonka",
+    "fs": "^0.0.1-security",
     "next": "12.0.9",
     "react": "^17.0.2",
     "react-dom": "17.0.2",
+    "react-toastify": "^8.1.0",
     "tailwindcss": "^3.0.18"
   },
   "devDependencies": {

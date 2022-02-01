@@ -8,7 +8,12 @@ import { Wallet } from '@metaplex/js';
 import ArweaveUploader from './arweave-uploader'
 import log from 'loglevel';
 
-log.enableAll()
+export interface CandyMachineState {
+  itemsAvailable: number,
+  itemsRedeemed: number,
+  itemsRemaining: number,
+  goLiveDate: Date,
+}
 
 export default class Wonka {
   private _provider: Provider;
@@ -49,21 +54,19 @@ export default class Wonka {
       imageContext)
   }
 
-  public async getCandyMachineState() {
+  public async getCandyMachineState(): Promise <CandyMachineState> {
     const candyMachineProgramIDL = await Program.fetchIdl(CANDY_MACHINE_PROGRAM_ID, this._provider);
     const candyMachineProgram = new Program(candyMachineProgramIDL!, CANDY_MACHINE_PROGRAM_ID, this._provider);
     const candyMachineAccount = await candyMachineProgram.account.candyMachine.fetch(this._candyMachineId);
     const itemsAvailable = candyMachineAccount.data.itemsAvailable.toNumber();
     const itemsRedeemed = candyMachineAccount.itemsRedeemed.toNumber();
     const itemsRemaining = itemsAvailable - itemsRedeemed;
-    const goLiveData = candyMachineAccount.data.goLiveDate.toNumber();
-    const goLiveDateTimeString = `${new Date(goLiveData * 1000).toUTCString()}`;
+    const goLiveDate = new Date(candyMachineAccount.data.goLiveDate.toNumber() * 1000)
     return {
       itemsAvailable,
       itemsRedeemed,
       itemsRemaining,
-      goLiveData,
-      goLiveDateTimeString,
+      goLiveDate
     };
   }
 }
