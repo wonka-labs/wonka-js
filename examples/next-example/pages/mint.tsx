@@ -126,12 +126,6 @@ const StatePage: NextPage = () => {
     router.push('/mints');
   }
 
-  /**
-   * J9C5Dfrxra6QGc6QRHTKHZPWCi1Umiw1rbKcYHpGGkFb
-Mint Transaction: kJRHwVS1Ax51R2zoP95xZrNkEPiYACQ8Wuh6HxKZdbA96kPUtxxixXdNFbxT5tYEPSWvvEH1hWAmrmDwsz4ieEf
-
-https://solscan.io/tx/4MmF6r7RyCXYWucWP6RNesJdv21bwZTffcMfCK9eycXDXZbhKPcJsripNcjfCB78wzeZY9fasyxBCbPLk3DduqsS?cluster=devnet
-   */
   return (
     <div className="container flex flex-col mx-auto lg:px-48 px-20 justify-center items-center h-screen">
       <h1 className="text-5xl text-center">Mint a New Token</h1>

@@ -33,10 +33,7 @@ const Mints: NextPage = () => {
   // 2. Fetch mints.
   useEffect(() => {
     async function fetchMints() {
-      if (wonka) {
-        const fetchedMints = await wonka.getCandyMachineMints()
-        setMints(fetchedMints)
-      }
+
     }
     fetchMints();
   }, [wonka]);
@@ -51,24 +48,6 @@ const Mints: NextPage = () => {
           <div>
             <p className="opacity-50 text-2xl pb-4">Latest Wagmiis</p>
           </div>
-
-          {mints && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-14">
-              {mints.map((mint, index) => {
-                return (
-                  <div key={item.uri + index}>
-                    <Image
-                      width="208"
-                      height="208"
-                      src={item.uri}
-                      alt={`wagmii profile photo.`}
-                    />
-                    <p className="text-2xl">{item.name}</p>
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </div>
       <div className="my-10">
         <Button title="Continue to Minting >" didTapButton={didTapContinue} />
