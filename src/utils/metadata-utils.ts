@@ -44,11 +44,15 @@ const getCandyMachineMints = async (candyMachineId: string, connection: Connecti
   );
 };
 
-const getMintMetadata = async (connection: Connection, mintAddress: PublicKey): Promise<MetadataDataData> => {
+const getMintMetadata = async (connection: Connection, mintAddress: PublicKey): Promise<Metadata> => {
   const metadataPDA = await Metadata.getPDA(mintAddress);
   log.info(`Loading metadata PDA ${metadataPDA.toString()} for token address: ${mintAddress.toString()}.`)
-  const metaData = await Metadata.load(connection, metadataPDA);
-  return metaData.data.data as MetadataDataData
+  return await Metadata.load(connection, metadataPDA);
+}
+
+const getMintMetadataDataData = async (connection: Connection, mintAddress: PublicKey): Promise<MetadataDataData> => {
+  const metadata = await getMintMetadata(connection, mintAddress)
+  return metadata.data.data as MetadataDataData
 }
 
 const updateMintURI = async (
@@ -58,25 +62,25 @@ const updateMintURI = async (
   mintKey: PublicKey, 
   mintURI: string,
   imageContext: any): Promise <{txid: string, error?: TransactionError}> => {
-  const metadataData = await getMintMetadata(connection, mintKey)
-  const metadataDataData = await fetch(metadataData.uri)
-  const metadataDataDataJSON = await metadataDataData.json()
-  metadataDataDataJSON.image = mintURI
-  metadataDataDataJSON.properties.files[0].uri = mintURI
-  metadataDataDataJSON.imageContext = imageContext
-  const metadataDataDataJSONArweaveURI = await arweaveUploader.uploadJSON(metadataDataDataJSON)
-  metadataData.uri = metadataDataDataJSONArweaveURI
+  const metadataDataData = await getMintMetadataDataData(connection, mintKey)
+  const metadataDataDataURI = await fetch(metadataDataData.uri)
+  const metadataDataDataURIJSON = await metadataDataDataURI.json()
+  metadataDataDataURIJSON.image = mintURI
+  metadataDataDataURIJSON.properties.files[0].uri = mintURI
+  metadataDataDataURIJSON.imageContext = imageContext
+  const metadataDataDataJSONArweaveURI = await arweaveUploader.uploadJSON(metadataDataDataURIJSON)
+  metadataDataData.uri = metadataDataDataJSONArweaveURI
   const txid = await actions.updateMetadata({
     connection, 
     editionMint: new PublicKey(mintKey),
     wallet,
-    newMetadataData: metadataData,
+    newMetadataData: metadataDataData,
   })
   log.info(`Starting update metadata transaction with id:${txid}.`)
   return new Promise((resolve, reject) => {
     connection.onSignatureWithOptions(
       txid,
-      async (notification, context) => {
+      async (notification, _) => {
         log.info(`Got notification of type: ${notification.type} from txid: ${txid}.`);
         if (notification.type === 'status') {
           const { result } = notification;
