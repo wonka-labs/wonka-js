@@ -50,7 +50,7 @@ function toastWithMessage(message: string, error: boolean = false) {
   }
 }
 
-const StatePage: NextPage = () => {
+const MintPage: NextPage = () => {
   // State:
   const [wonka, setWonka] = useState<Wonka | null>(null);
   const [mintState, setMintState] = useState<MintState>(MintState.READY);
@@ -100,9 +100,13 @@ const StatePage: NextPage = () => {
   function didTapContinue() {
     router.push('/mints');
   }
+  
+  function didTapBack() {
+    router.push('/state')
+  }
 
   return (
-    <div className="container flex flex-col mx-auto lg:px-48 px-20 justify-center items-center h-screen">
+    <div className="container flex flex-col mx-auto lg:px-80 px-20 justify-center items-center h-screen">
       <h1 className="text-5xl text-center">Mint a New Token</h1>
       <p>
         Use <code>mintCandyMachineToken(...)</code> to mint a new token. Once successfully minted, you should see the
@@ -127,6 +131,7 @@ const StatePage: NextPage = () => {
         </li>
       </ul>
       <div className="flex flex-row space-x-3 my-10">
+      <Button title="< Back to State" didTapButton={didTapBack} />
         <Button title="Tap to Mint" didTapButton={didTapMint} />
         <Button title="Fetch Mints >" didTapButton={didTapContinue} />
       </div>
@@ -134,4 +139,4 @@ const StatePage: NextPage = () => {
   );
 };
 
-export default StatePage;
+export default MintPage;

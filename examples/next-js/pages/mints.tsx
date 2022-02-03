@@ -1,15 +1,12 @@
 import type { NextPage } from 'next';
 import Image from 'next/image';
 import { SpinnerCircularFixed } from 'spinners-react';
-
 import { useRouter } from 'next/router';
 import Button from '../components/Button';
-import { useConnection, useAnchorWallet, useWallet } from '@solana/wallet-adapter-react';
-import { Wonka, CandyMachineState } from '@triton-labs/wonka';
+import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
+import { Wonka } from '@triton-labs/wonka';
 import { Provider } from '@project-serum/anchor';
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { MetadataDataData } from '@metaplex-foundation/mpl-token-metadata';
-import { PublicKey } from '@solana/web3.js';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 
 interface Mint {
@@ -71,16 +68,16 @@ const Mints: NextPage = () => {
   }
 
   return (
-    <div className="container flex flex-col mx-auto lg:px-48 px-20 justify-center items-center min-h-screen">
+    <div className="container flex flex-col mx-auto lg:px-80 px-20 justify-center items-center min-h-screen">
       <div>
-        <h1 className="text-5xl text-center">Fetching all Mints</h1>
+        <h1 className="text-5xl text-center mt-20">Fetching all Mints</h1>
         <p>
           Loading mints without using an indexer takes some time — give it a sec and we will load all existing minta via{' '}
           <code>getCandyMachineMints(..)</code>. Click on one of the mints to use <code>getMintMetadata(..)</code> to
           fetch mint metadata.
         </p>
         {mints ? (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-14 mt-10">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-14 mt-11">
             {mints.map((mint, index) => {
               console.log(`rendering mint with index: ${index}`);
               return (
@@ -100,7 +97,7 @@ const Mints: NextPage = () => {
       <div className="flex flex-row space-x-3 mt-10 mb-4">
         <Button title="Back to Minting" didTapButton={didTapBack} />
       </div>
-      <p className='mb-10'>Tap on one of the mints to go to metadata page.</p>
+      <p className='mb-10 italic'>Tap on one of the mints to go to metadata page.</p>
     </div>
   );
 };

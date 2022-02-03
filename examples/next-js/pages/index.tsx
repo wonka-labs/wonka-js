@@ -1,16 +1,33 @@
 import type { NextPage } from 'next';
-
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import Button from '../components/Button';
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 const Home: NextPage = () => {
+  const { connected } = useWallet();
+  const { setVisible } = useWalletModal();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (connected) {
+      router.push('/state')
+    }
+  }, [connected, router])
+
+  function didTapAuthenticate() {
+    setVisible(true)
+  }
+
   return (
-    <div className="container flex mx-auto lg:px-48 px-20 justify-center items-center h-screen">
-      <div>
-        <h1 className="text-5xl text-center">Welcome to Wonka</h1>
-        <p>
-          Wonka JS simplifies the minting process with MetaPlex{"'"}s Candy Machine. Once you have followed the
-          instructions to upload your NFTs, you can easily use the following commands to build your mint flow:{' '}
-        </p>
+    <div className="container flex flex-col mx-auto lg:px-80 px-20 justify-center items-center min-h-screen">
+      <h1 className="text-5xl text-center pb-4">Welcome to Wonka</h1>
+      <p>
+        Wonka JS simplifies the minting process with MetaPlex{"'"}s Candy Machine. Once you have followed the
+        instructions to upload your NFTs, you can easily use the following commands to build your mint flow:{' '}
+      </p>
+      <div className='w-full'>
         <ul className="list-disc px-10">
           <li>
             <code>getCandyMachineState(..)</code>
@@ -25,15 +42,14 @@ const Home: NextPage = () => {
             <code>getMintMetadata(..)</code>
           </li>
         </ul>
-        <p>
-          To get started, first you need to connect your wallet. We are using{' '}
-          <a href="https://github.com/solana-labs/wallet-adapter">wallet adapter</a> from Solana Labs below, but you can
-          also write you own.
-        </p>
-        <div className="text-center">
-          <WalletMultiButton />
-        </div>
       </div>
+      <p className='pb-10'>
+        To get started, first you need to connect your wallet. We are using{' '}
+        <a href="https://github.com/solana-labs/wallet-adapter">wallet adapter</a> from Solana Labs below, but you can
+        also write you own.
+      </p>
+
+      <Button title="Connect Wallet to Continue" didTapButton={didTapAuthenticate} />
     </div>
   );
 };

@@ -38,7 +38,7 @@ programCommand('get-metadata')
     const wonka = wonkaWithCommandOptions(keypair, env, candyMachineId);
     const mintAddress = new PublicKey(mint);
     const mintMetadata = await wonka.getMintMetadata(mintAddress);
-    const metadataDataURIData = await fetch(mintMetadata.uri);
+    const metadataDataURIData = await fetch(mintMetadata.data.data.uri);
     const metadataDataURIDataJSON = await metadataDataURIData.json();
     prettyPrint(`Fetched metadata for mint: ${mint}:`, mintMetadata);
     prettyPrint(`Fetched metadata URI data for mint: ${mint}:`, metadataDataURIDataJSON);

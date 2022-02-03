@@ -47,7 +47,7 @@ programCommand('get-metadata')
     const wonka = wonkaWithCommandOptions(keypair, env, candyMachineId);
     const mintAddress = new web3_js_1.PublicKey(mint);
     const mintMetadata = yield wonka.getMintMetadata(mintAddress);
-    const metadataDataURIData = yield (0, node_fetch_1.default)(mintMetadata.uri);
+    const metadataDataURIData = yield (0, node_fetch_1.default)(mintMetadata.data.data.uri);
     const metadataDataURIDataJSON = yield metadataDataURIData.json();
     prettyPrint(`Fetched metadata for mint: ${mint}:`, mintMetadata);
     prettyPrint(`Fetched metadata URI data for mint: ${mint}:`, metadataDataURIDataJSON);

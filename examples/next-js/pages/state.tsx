@@ -5,29 +5,24 @@ import { useConnection, useAnchorWallet, useWallet } from '@solana/wallet-adapte
 import { Wonka, CandyMachineState } from '@triton-labs/wonka';
 import { Provider } from '@project-serum/anchor';
 import { useState, useEffect, useRef } from 'react';
+import { SpinnerCircularFixed } from 'spinners-react';
 
 const CandyMachineState = ({ candyMachineState }: { candyMachineState: CandyMachineState }) => {
   return (
-    <div>
-      <h1 className="text-5xl text-center">Fetching Candy Machine State</h1>
-      <p>
-        Used <code>getCandyMachineState(...)</code> to fetch candy machine state.
-      </p>
-      <ul className="list-disc px-10">
-        <li>
-          Items Available: <b>{candyMachineState.itemsAvailable}</b>
-        </li>
-        <li>
-          Items Redeemed: <b>{candyMachineState.itemsRedeemed}</b>
-        </li>
-        <li>
-          Items Remaining: <b>{candyMachineState.itemsRemaining}</b>
-        </li>
-        <li>
-          Go Live Date: <b>{candyMachineState.goLiveDate.toUTCString()}</b>
-        </li>
-      </ul>
-    </div>
+    <ul className="list-disc px-10 w-full">
+      <li>
+        Items Available: <b>{candyMachineState.itemsAvailable}</b>
+      </li>
+      <li>
+        Items Redeemed: <b>{candyMachineState.itemsRedeemed}</b>
+      </li>
+      <li>
+        Items Remaining: <b>{candyMachineState.itemsRemaining}</b>
+      </li>
+      <li>
+        Go Live Date: <b>{candyMachineState.goLiveDate.toUTCString()}</b>
+      </li>
+    </ul>
   );
 };
 
@@ -65,12 +60,20 @@ const StatePage: NextPage = () => {
   }, [wonka]);
 
   function didTapContinue() {
-    router.push("mint")
+    router.push('mint');
   }
 
   return (
-    <div className="container flex flex-col mx-auto lg:px-48 px-20 justify-center items-center h-screen">
-      {candyMachineState && <CandyMachineState candyMachineState={candyMachineState!} />}
+    <div className="container flex flex-col mx-auto lg:px-80 px-20 justify-center items-center h-screen">
+      <h1 className="text-5xl text-center">Candy Machine State</h1>
+      <p className='w-full'>
+        Using <code>getCandyMachineState(...)</code> to fetch candy machine state. Useful for knowing how many mints are still available and if the candy machine is already sold out!
+      </p>
+      {candyMachineState ? (
+        <CandyMachineState candyMachineState={candyMachineState!} />
+      ) : (
+        <SpinnerCircularFixed color="white" secondaryColor="#515154" className="mx-auto mt-3" />
+      )}
       <div className="my-10">
         <Button title="Continue to Minting >" didTapButton={didTapContinue} />
       </div>
