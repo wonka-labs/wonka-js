@@ -2,7 +2,7 @@ import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import Button from '../components/Button';
 import { useConnection, useAnchorWallet, useWallet } from '@solana/wallet-adapter-react';
-import { Wonka, CandyMachineState } from '@triton-labs/wonka';
+import { Wonka } from '@triton-labs/wonka';
 import { Provider } from '@project-serum/anchor';
 import { useState, useEffect } from 'react';
 import { PublicKey } from '@solana/web3.js';
@@ -15,31 +15,6 @@ function solscanMintLink(address: string, cluster: string): string {
 function solscanTxidLink(txid: string, cluster: string): string {
   return `https://solscan.io/tx/${txid}?cluster=${cluster}`;
 }
-
-const CandyMachineState = ({ candyMachineState }: { candyMachineState: CandyMachineState }) => {
-  return (
-    <div>
-      <h1 className="text-5xl text-center">Fetching Candy Machine State</h1>
-      <p>
-        Used <code>getCandyMachineState(...)</code> to fetch candy machine state.
-      </p>
-      <ul className="list-disc px-10">
-        <li>
-          Items Available: <b>{candyMachineState.itemsAvailable}</b>
-        </li>
-        <li>
-          Items Redeemed: <b>{candyMachineState.itemsRedeemed}</b>
-        </li>
-        <li>
-          Items Remaining: <b>{candyMachineState.itemsRemaining}</b>
-        </li>
-        <li>
-          Go Live Date: <b>{candyMachineState.goLiveDate.toUTCString()}</b>
-        </li>
-      </ul>
-    </div>
-  );
-};
 
 enum MintState {
   READY = 0,
@@ -100,7 +75,7 @@ const StatePage: NextPage = () => {
     }
   }, [anchorWallet, connection]);
 
-  // 2. Fetch state.
+  // 2. Mint a token.
   useEffect(() => {
     async function mint() {
       if (wonka && mintState === MintState.QUEUED) {
