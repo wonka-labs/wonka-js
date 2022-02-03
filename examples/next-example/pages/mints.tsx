@@ -52,7 +52,6 @@ const Mints: NextPage = () => {
           fetchedMints.map(async (metadata) => {
             const data = await fetch(metadata.data.data.uri);
             const dataJSON = await data.json();
-            console.log(metadata.pubkey.toString());
             return { key: metadata.data.mint, name: dataJSON.name, imageURL: dataJSON.image };
           }),
         );
