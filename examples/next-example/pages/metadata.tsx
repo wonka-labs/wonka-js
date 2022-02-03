@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import Image from "next/image";
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Button from '../components/Button';
 import { useConnection, useAnchorWallet, useWallet } from '@solana/wallet-adapter-react';
@@ -7,6 +7,7 @@ import { Wonka, CandyMachineState } from '@triton-labs/wonka';
 import { Provider } from '@project-serum/anchor';
 import { useState, useEffect, useRef } from 'react';
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata';
+import { PublicKey } from '@solana/web3.js';
 
 const Mints: NextPage = () => {
   // State:
@@ -30,27 +31,38 @@ const Mints: NextPage = () => {
     }
   }, [anchorWallet, connection]);
 
-  // 2. Fetch mints.
+  // 2. Fetch mint metadata.
   useEffect(() => {
-    async function fetchMints() {
-
+    async function fetchMintMetadata() {
+      if (!wonka) {
+        return;
+      }
+      const mintAddressString = router.query.address;
+      if (mintAddressString) {
+        const mintAddress = new PublicKey(mintAddressString);
+        const metadata = await wonka.getMintMetadata(mintAddress);
+        console.log(metadata);
+      } else {
+        router.push('/mints');
+      }
     }
-    fetchMints();
-  }, [wonka]);
+    fetchMintMetadata();
+  }, [wonka, router]);
 
-  function didTapContinue() {
-    router.push("mint")
+  function didTapBack() {
+    router.push('mints');
   }
 
   return (
-    <div className="container flex flex-col mx-auto lg:px-48 px-20 justify-center items-center h-screen">
-      <div id="latest" className="pt-10">
-          <div>
-            <p className="opacity-50 text-2xl pb-4">Latest Wagmiis</p>
-          </div>
-        </div>
+    <div className="container flex flex-col mx-auto lg:px-48 px-20 justify-center items-center min-h-screen">
+      <div>
+        <h1 className="text-5xl text-center">Fetching Mint Metdata</h1>
+        <p>
+          Using <code>getMintMetadata(..)</code> to fetch more information about the mint.
+        </p>
+      </div>
       <div className="my-10">
-        <Button title="Continue to Minting >" didTapButton={didTapContinue} />
+        <Button title="< Back to Mints" didTapButton={didTapBack} />
       </div>
     </div>
   );

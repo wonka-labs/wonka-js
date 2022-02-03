@@ -30,14 +30,16 @@ const Mints: NextPage = () => {
   const router = useRouter();
 
   // 1. Create Wonka.
-  useMemo(() => {
-    if (anchorWallet && connection && !wonka) {
+  useEffect(() => {
+    if (anchorWallet && connection) {
       const provider = new Provider(connection, anchorWallet, {
         preflightCommitment: 'processed',
       });
       setWonka(new Wonka(provider, process.env.NEXT_PUBLIC_CANDY_MACHINE_ID!));
+    } else {
+      setWonka(null);
     }
-  }, [anchorWallet, connection, wonka]);
+  }, [anchorWallet, connection]);
 
   // 2. Fetch mints.
   useMemo(() => {
@@ -47,11 +49,11 @@ const Mints: NextPage = () => {
         console.log('Fetching mints...');
         const fetchedMints = await wonka.getCandyMachineMints();
         const fetchedMintsData = await Promise.all(
-          fetchedMints.map(async (mint) => {
-            const data = await fetch(mint.data.data.uri);
+          fetchedMints.map(async (metadata) => {
+            const data = await fetch(metadata.data.data.uri);
             const dataJSON = await data.json();
-            console.log(mint.pubkey.toString());
-            return { key: mint.pubkey.toString(), name: dataJSON.name, imageURL: dataJSON.image };
+            console.log(metadata.pubkey.toString());
+            return { key: metadata.data.mint, name: dataJSON.name, imageURL: dataJSON.image };
           }),
         );
         setMints(fetchedMintsData);
