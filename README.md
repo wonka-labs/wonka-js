@@ -1,6 +1,11 @@
 # Wonka JS
 
-`Wonka JS` simplifies the minting process with [MetaPlex's Candy Machine](https://docs.metaplex.com/candy-machine-v2/introduction). Once you have [followed the instructions to upload your NFTs](https://docs.metaplex.com/candy-machine-v2/preparing-assets), you can easily use the following commands to build your mint flow:
+`Wonka JS` is the easiest way to mint [Candy Machine](https://docs.metaplex.com/candy-machine-v2/introduction) NFTs through JS APIs. You can see an end to end example in [Next.js demo project](https://github.com/TritonLabs/wonka/tree/main/examples/next-js) as well as debug using the [command line testing tool](https://github.com/TritonLabs/wonka/tree/main/cli). 
+
+![FI3xQ2FVcAQO3wK](https://user-images.githubusercontent.com/796815/153501801-7b3b5d27-a747-4df8-8cec-c5c7d2b233bb.jpeg)
+
+
+Once you have [followed the instructions to upload your NFTs](https://docs.metaplex.com/candy-machine-v2/preparing-assets), you can use functions below to build your mint flow:
 
 * `mintCandyMachineToken(..)`
 * `getCandyMachineMints(..)`
