@@ -1,8 +1,8 @@
 import { Program, Provider } from '@project-serum/anchor';
-import { PublicKey, Connection} from '@solana/web3.js';
+import { PublicKey, Connection } from '@solana/web3.js';
 import { CANDY_MACHINE_PROGRAM_ID } from './program-ids';
 import { web3 } from '@project-serum/anchor';
-import { getCandyMachineMints, getMintMetadata, updateMintImage } from './utils/metadata-utils';
+import { getCandyMachineMints, getMintMetadata, updateMintImage, updateMintGLB } from './utils/metadata-utils';
 import { mintCandyMachineToken } from './utils/minting-utils';
 import { Wallet } from '@metaplex/js';
 import ArweaveUploader from './arweave-uploader'
@@ -44,18 +44,31 @@ export default class Wonka {
 
   public async updateMintImage(b64image: string,
     arweaveUploader: ArweaveUploader,
-    wallet: Wallet, 
+    wallet: Wallet,
     mintAddress: PublicKey,
     imageContext: any) {
-    return await updateMintImage(b64image, 
-      this._provider.connection, 
-      arweaveUploader, 
-      wallet, 
-      mintAddress, 
+    return await updateMintImage(b64image,
+      this._provider.connection,
+      arweaveUploader,
+      wallet,
+      mintAddress,
       imageContext)
   }
 
-  public async getCandyMachineState(): Promise <CandyMachineState> {
+  public async updateMintGLB(glb: ArrayBufferLike, b64image: string,
+    arweaveUploader: ArweaveUploader,
+    wallet: Wallet,
+    mintAddress: PublicKey,
+    imageContext: any) {
+    return await updateMintGLB(glb, b64image,
+      this._provider.connection,
+      arweaveUploader,
+      wallet,
+      mintAddress,
+      imageContext)
+  }
+
+  public async getCandyMachineState(): Promise<CandyMachineState> {
     const candyMachineProgramIDL = await Program.fetchIdl(CANDY_MACHINE_PROGRAM_ID, this._provider);
     const candyMachineProgram = new Program(candyMachineProgramIDL!, CANDY_MACHINE_PROGRAM_ID, this._provider);
     const candyMachineAccount = await candyMachineProgram.account.candyMachine.fetch(this._candyMachineId);

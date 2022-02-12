@@ -1,8 +1,8 @@
 import { Connection, PublicKey, TransactionError } from '@solana/web3.js';
 import { Metadata, MetadataProgram, MetadataDataData } from '@metaplex-foundation/mpl-token-metadata';
-import { Wallet, actions} from '@metaplex/js';
+import { Wallet, actions } from '@metaplex/js';
 import ArweaveUploader from '../arweave-uploader';
-import {getCandyMachineCreator} from '../utils/pda-utils'
+import { getCandyMachineCreator } from '../utils/pda-utils'
 import log from 'loglevel';
 
 const MAX_NAME_LENGTH = 32;
@@ -55,23 +55,21 @@ const getMintMetadataDataData = async (connection: Connection, mintAddress: Publ
   return metadata.data.data as MetadataDataData
 }
 
-const updateMintURI = async (
-  connection: Connection, 
+const updateMintMetadata = async (
+  connection: Connection,
   arweaveUploader: ArweaveUploader,
-  wallet: Wallet, 
-  mintKey: PublicKey, 
-  mintURI: string,
-  imageContext: any): Promise <{txid: string, error?: TransactionError}> => {
+  wallet: Wallet,
+  mintKey: PublicKey,
+  imageContext: any,
+  jsonUpdate: (metadataDataDataURIJSON: any) => void): Promise<{ txid: string, error?: TransactionError }> => {
   const metadataDataData = await getMintMetadataDataData(connection, mintKey)
   const metadataDataDataURI = await fetch(metadataDataData.uri)
-  const metadataDataDataURIJSON = await metadataDataDataURI.json()
-  metadataDataDataURIJSON.image = mintURI
-  metadataDataDataURIJSON.properties.files[0].uri = mintURI
-  metadataDataDataURIJSON.imageContext = imageContext
+  let metadataDataDataURIJSON = await metadataDataDataURI.json()
+  jsonUpdate(metadataDataDataURIJSON);
   const metadataDataDataJSONArweaveURI = await arweaveUploader.uploadJSON(metadataDataDataURIJSON)
   metadataDataData.uri = metadataDataDataJSONArweaveURI
   const txid = await actions.updateMetadata({
-    connection, 
+    connection,
     editionMint: new PublicKey(mintKey),
     wallet,
     newMetadataData: metadataDataData,
@@ -98,19 +96,59 @@ const updateMintURI = async (
 
 const updateMintImage = async (
   b64image: string,
-  connection: Connection, 
+  connection: Connection,
   arweaveUploader: ArweaveUploader,
-  wallet: Wallet, 
+  wallet: Wallet,
   mintAddress: PublicKey,
-  imageContext: any) => { 
-    const uri = await arweaveUploader.uploadBase64PNG(b64image)
-    log.info(`Uploaded base64 image to arweave, here is the url: ${uri}`)
-    return await updateMintURI(connection, arweaveUploader, wallet, mintAddress, uri, imageContext)
+  imageContext: any) => {
+  const uri = await arweaveUploader.uploadBase64PNG(b64image)
+  log.info(`Uploaded base64 image to arweave, here is the url: ${uri}`)
+  return await updateMintMetadata(connection, arweaveUploader, wallet, mintAddress, imageContext, json => {
+    json.image = uri
+    json.properties.files[0].uri = uri
+    json.imageContext = imageContext
+  })
 }
 
-export { 
+const updateMintGLB = async (
+  glb: ArrayBufferLike,
+  b64image: string,
+  connection: Connection,
+  arweaveUploader: ArweaveUploader,
+  wallet: Wallet,
+  mintAddress: PublicKey,
+  imageContext: any) => {
+  const animationUri = await arweaveUploader.uploadBuffer(glb, 'model/gltf-binary', 'glb');
+  log.info(`Uploaded glb to arweave, here is the url: ${animationUri}`)
+  const imageUri = await arweaveUploader.uploadBase64PNG(b64image)
+  log.info(`Uploaded base64 preview image to arweave, here is the url: ${imageUri}`)
+  return await updateMintMetadata(connection, arweaveUploader, wallet, mintAddress, imageContext, json => {
+    json.image = imageUri
+    json.animation_url = animationUri;
+    json.imageContext = imageContext
+    const properties = {
+      files: [
+        {
+          uri: imageUri,
+          type: "image/png",
+        },
+        {
+          uri: animationUri,
+          type: "model/gltf-binary",
+        },
+      ],
+      category: "vr",
+    }
+    if (json.properties?.creators) {
+      properties['creators'] = json.properties!.creators
+    }
+    json.properties = properties
+  })
+}
+
+export {
   getCandyMachineMints,
   getMintMetadata,
-  updateMintURI,
-  updateMintImage
- };
+  updateMintImage,
+  updateMintGLB,
+};
