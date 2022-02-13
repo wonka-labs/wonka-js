@@ -4,4 +4,4 @@ import ArweaveUploader from './arweave-uploader';
 
 export default Wonka;
 
-export { Wonka, CandyMachineState, ArweaveUploader, getMintPrice};
+export { Wonka, CandyMachineState, ArweaveUploader, getMintPrice };

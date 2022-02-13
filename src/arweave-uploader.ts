@@ -39,7 +39,7 @@ export default class ArweaveUploader {
   }
 
   public async uploadBuffer(buf: ArrayBufferLike, mimeType: string, arweaveExt?: string): Promise<string> {
-    console.log('uploadBuffer', mimeType, arweaveExt);
+    log.info('uploadBuffer', mimeType, arweaveExt);
     const transaction = await this._arweave.createTransaction({ data: buf }, this._arweaveKey);
     transaction.addTag('Content-Type', mimeType);
     await this._arweave.transactions.sign(transaction, this._arweaveKey);

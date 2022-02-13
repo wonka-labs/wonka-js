@@ -1,4 +1,4 @@
-import { Program, Provider } from '@project-serum/anchor'
+import { Provider } from '@project-serum/anchor'
 import { PublicKey} from '@solana/web3.js';
 import { CANDY_MACHINE_PROGRAM_ID } from '../program-ids';
 import * as anchor from '@project-serum/anchor';

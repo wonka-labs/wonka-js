@@ -64,7 +64,7 @@ const updateMintMetadata = async (
   jsonUpdate: (metadataDataDataURIJSON: any) => void): Promise<{ txid: string, error?: TransactionError }> => {
   const metadataDataData = await getMintMetadataDataData(connection, mintKey)
   const metadataDataDataURI = await fetch(metadataDataData.uri)
-  let metadataDataDataURIJSON = await metadataDataDataURI.json()
+  const metadataDataDataURIJSON = await metadataDataDataURI.json()
   jsonUpdate(metadataDataDataURIJSON);
   const metadataDataDataJSONArweaveURI = await arweaveUploader.uploadJSON(metadataDataDataURIJSON)
   metadataDataData.uri = metadataDataDataJSONArweaveURI
@@ -140,6 +140,7 @@ const updateMintGLB = async (
       category: "vr",
     }
     if (json.properties?.creators) {
+      /* tslint:disable:no-string-literal */
       properties['creators'] = json.properties!.creators
     }
     json.properties = properties
