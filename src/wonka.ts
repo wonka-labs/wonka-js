@@ -1,20 +1,13 @@
-import { Program, Provider } from '@project-serum/anchor';
+import { Provider } from '@project-serum/anchor';
 import { PublicKey, Connection } from '@solana/web3.js';
-import { CANDY_MACHINE_PROGRAM_ID } from './program-ids';
 import { web3 } from '@project-serum/anchor';
 import { getCandyMachineMints, getMintMetadata, updateMintImage, updateMintGLB } from './utils/metadata-utils';
 import { mintCandyMachineToken } from './utils/minting-utils';
 import { Wallet } from '@metaplex/js';
-import ArweaveUploader from './arweave-uploader'
+import ArweaveUploader from './arweave-uploader';
 import log from 'loglevel';
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata';
-
-export interface CandyMachineState {
-  itemsAvailable: number,
-  itemsRedeemed: number,
-  itemsRemaining: number,
-  goLiveDate: Date,
-}
+import {getCandyMachineState, CandyMachineState} from './utils/state-utils';
 
 export default class Wonka {
   private _provider: Provider;
@@ -23,7 +16,7 @@ export default class Wonka {
   public constructor(provider: Provider, candyMachineId: string) {
     this._provider = provider;
     this._candyMachineId = new web3.PublicKey(candyMachineId);
-    log.info(`Initialized a Wonka with candy machine ID: ${candyMachineId}.`)
+    log.info(`Initialized a Wonka with candy machine ID: ${candyMachineId}.`);
   }
 
   public async getCandyMachineMints(): Promise<Metadata[]> {
@@ -35,52 +28,50 @@ export default class Wonka {
   }
 
   public async getMintMetadata(mintAddress: PublicKey): Promise<Metadata> {
-    return await getMintMetadata(this._provider.connection, mintAddress)
+    return await getMintMetadata(this._provider.connection, mintAddress);
   }
 
   public static async getMintMetadata(connection: Connection, mintAddress: PublicKey) {
-    return await getMintMetadata(connection, mintAddress)
+    return await getMintMetadata(connection, mintAddress);
   }
 
-  public async updateMintImage(b64image: string,
+  public async updateMintImage(
+    b64image: string,
     arweaveUploader: ArweaveUploader,
     wallet: Wallet,
     mintAddress: PublicKey,
-    imageContext: any) {
-    return await updateMintImage(b64image,
+    imageContext: any,
+  ) {
+    return await updateMintImage(
+      b64image,
       this._provider.connection,
       arweaveUploader,
       wallet,
       mintAddress,
-      imageContext)
+      imageContext,
+    );
   }
 
-  public async updateMintGLB(glb: ArrayBufferLike, b64image: string,
+  public async updateMintGLB(
+    glb: ArrayBufferLike,
+    b64image: string,
     arweaveUploader: ArweaveUploader,
     wallet: Wallet,
     mintAddress: PublicKey,
-    imageContext: any) {
-    return await updateMintGLB(glb, b64image,
+    imageContext: any,
+  ) {
+    return await updateMintGLB(
+      glb,
+      b64image,
       this._provider.connection,
       arweaveUploader,
       wallet,
       mintAddress,
-      imageContext)
+      imageContext,
+    );
   }
 
   public async getCandyMachineState(): Promise<CandyMachineState> {
-    const candyMachineProgramIDL = await Program.fetchIdl(CANDY_MACHINE_PROGRAM_ID, this._provider);
-    const candyMachineProgram = new Program(candyMachineProgramIDL!, CANDY_MACHINE_PROGRAM_ID, this._provider);
-    const candyMachineAccount = await candyMachineProgram.account.candyMachine.fetch(this._candyMachineId);
-    const itemsAvailable = candyMachineAccount.data.itemsAvailable.toNumber();
-    const itemsRedeemed = candyMachineAccount.itemsRedeemed.toNumber();
-    const itemsRemaining = itemsAvailable - itemsRedeemed;
-    const goLiveDate = new Date(candyMachineAccount.data.goLiveDate.toNumber() * 1000)
-    return {
-      itemsAvailable,
-      itemsRedeemed,
-      itemsRemaining,
-      goLiveDate
-    };
+    return await getCandyMachineState(this._provider, this._candyMachineId)
   }
 }

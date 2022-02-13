@@ -2,7 +2,7 @@ import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import Button from '../components/Button';
 import { useConnection, useAnchorWallet, useWallet } from '@solana/wallet-adapter-react';
-import { Wonka, CandyMachineState } from '@triton-labs/wonka';
+import { Wonka, CandyMachineState, getMintPrice } from '@triton-labs/wonka';
 import { Provider } from '@project-serum/anchor';
 import { useState, useEffect, useRef } from 'react';
 import { SpinnerCircularFixed } from 'spinners-react';
@@ -10,6 +10,9 @@ import { SpinnerCircularFixed } from 'spinners-react';
 const CandyMachineState = ({ candyMachineState }: { candyMachineState: CandyMachineState }) => {
   return (
     <ul className="list-disc px-10 w-full">
+      <li>
+        Is Sold Out?: <b>{candyMachineState.isSoldOut ? "Yes" : "No"}</b>
+      </li>
       <li>
         Items Available: <b>{candyMachineState.itemsAvailable}</b>
       </li>
@@ -21,6 +24,9 @@ const CandyMachineState = ({ candyMachineState }: { candyMachineState: CandyMach
       </li>
       <li>
         Go Live Date: <b>{candyMachineState.goLiveDate.toUTCString()}</b>
+      </li>
+      <li>
+        Price: <b>{getMintPrice(candyMachineState)}</b>
       </li>
     </ul>
   );

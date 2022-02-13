@@ -1,7 +1,7 @@
 import Wonka from './wonka';
-import { CandyMachineState } from './wonka';
+import { getMintPrice, CandyMachineState } from './utils/state-utils';
 import ArweaveUploader from './arweave-uploader';
 
 export default Wonka;
 
-export { Wonka, CandyMachineState, ArweaveUploader };
+export { Wonka, CandyMachineState, ArweaveUploader, getMintPrice};
