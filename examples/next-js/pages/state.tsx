@@ -1,11 +1,12 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import Button from '../components/Button';
-import { useConnection, useAnchorWallet, useWallet } from '@solana/wallet-adapter-react';
+import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 import { Wonka, CandyMachineState, getMintPrice } from '@triton-labs/wonka';
 import { Provider } from '@project-serum/anchor';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { SpinnerCircularFixed } from 'spinners-react';
+import { Windex } from '@triton-labs/wonka'
 
 const CandyMachineState = ({ candyMachineState }: { candyMachineState: CandyMachineState }) => {
   return (
@@ -41,6 +42,17 @@ const StatePage: NextPage = () => {
   const { connection } = useConnection();
   const anchorWallet = useAnchorWallet();
   const router = useRouter();
+
+  // Sneak peak at Windex ;)
+  useEffect(() => {
+    console.log("foo")
+    async function fetch() {
+      const windex = new Windex(process.env.NEXT_PUBLIC_CANDY_MACHINE_ID!)
+      const collection = await windex.fetchCollection()
+      console.log(collection)
+    }
+    fetch()
+  }, [])
 
   // 1. Create Wonka.
   useEffect(() => {

@@ -44,6 +44,7 @@
     "@testing-library/user-event": "^12.1.10",
     "arweave": "^1.10.18",
     "assert": "^2.0.0",
+    "graphql-request": "^4.0.0",
     "loglevel": "^1.8.0",
     "next": "^12.0.7",
     "react": "^17.0.2",

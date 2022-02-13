@@ -6,7 +6,7 @@ import { Wonka } from '@triton-labs/wonka';
 import { Provider } from '@project-serum/anchor';
 import { useState, useEffect } from 'react';
 import { PublicKey } from '@solana/web3.js';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 function solscanMintLink(address: string, cluster: string): string {
   return `https://solscan.io/token/${address}?cluster=${cluster}`;
