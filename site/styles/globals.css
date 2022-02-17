@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "smallest-pixel-7";
+  src: url("/fonts/smallest_pixel-7.ttf");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  --main-bg-color: #1E203D;
+}
+
+html,
+body,
+#__next {
+  background-color: var(--main-bg-color);
+  width: 100%;
+  height: 100%;
+}
+
+nav {
+  background-color: var(--main-bg-color);
+}
+
+p,
+a,
+footer,
+span,
+button {
+  color: white;
+  @apply text-2xl;
+}
