@@ -1,6 +1,6 @@
 {
   "name": "@triton-labs/wonka",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Wonka is a JS library meant that simplifies the minting process on Metaplex's CandyMachine. ",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
