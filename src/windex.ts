@@ -4,12 +4,12 @@ import log from 'loglevel';
 
 export enum WINDEX_ENDPOINT {
   // Solana Devnet (https://explorer.solana.com/?cluster=devnet)
-  // To explore queries: https://index.wonkalabs.xyz/api/v1/devnet/graphiql
-  DEVNET = "https://index.wonkalabs.xyz/api/v1/devnet/graphql",
+  // To explore queries: https://api.wonkalabs.xyz/v0.1/solana/graphiql?cluster=devnet
+  DEVNET = "https://api.wonkalabs.xyz/v0.1/solana/devnet/graphql",
 
   // Solana Mainnet Beta (https://explorer.solana.com/)
-  // To explore queries: https://index.wonkalabs.xyz/api/v1/mainnet/graphiql
-  MAINNET = "https://index.wonkalabs.xyz/api/v1/mainnet/graphql",
+  // To explore queries: https://api.wonkalabs.xyz/v0.1/solana/graphiql?cluster=mainnet
+  MAINNET = "https://api.wonkalabs.xyz/v0.1/solana/mainnet/graphql",
 }
 
 export interface CandyMachineState {
