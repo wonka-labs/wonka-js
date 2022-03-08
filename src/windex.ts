@@ -75,24 +75,24 @@ type nft = {
   } | null;
 };
 
-function nftToCollectionItem(nft: nft): CollectionItem {
+function nftToCollectionItem(n: nft): CollectionItem {
   return {
-    address: nft.metaplex_metadata.mint,
-    name: nft.name,
-    symbol: nft.symbol,
-    description: nft.external_metadata?.description,
-    external_url: nft.external_metadata?.external_url,
-    image_url: nft.image.orig,
-    explorer_url: nft.explorer_url,
-    creators: nft.metaplex_metadata.creators,
-    files: nft.external_metadata?.properties?.files || [],
-    attributes: nft.external_metadata?.attributes || [],
+    address: n.metaplex_metadata.mint,
+    name: n.name,
+    symbol: n.symbol,
+    description: n.external_metadata?.description,
+    external_url: n.external_metadata?.external_url,
+    image_url: n.image.orig,
+    explorer_url: n.explorer_url,
+    creators: n.metaplex_metadata.creators,
+    files: n.external_metadata?.properties?.files || [],
+    attributes: n.external_metadata?.attributes || [],
   };
 }
 
 function nftsToCollectionItems(nfts: nft[]): CollectionItem[] {
-  return nfts.map((nft): CollectionItem => {
-    return nftToCollectionItem(nft);
+  return nfts.map((n): CollectionItem => {
+    return nftToCollectionItem(n);
   });
 }
 
