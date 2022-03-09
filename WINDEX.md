@@ -10,7 +10,7 @@ The easiest way to get started with Windex is using the `wonka` JS library.
 
 ### Installation
 ```
-npm install @triton-labs/wonka
+npm install @wonka-labs/wonka-js
 ```
 
 ### Fetching NFTs by Candy Machine or Collection ID
