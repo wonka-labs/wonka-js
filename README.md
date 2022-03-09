@@ -119,7 +119,7 @@ Read more about these in the docs: [React .env](https://create-react-app.dev/doc
 
 ## Windex APIs
 
-By default, fetching NFTs by Wallet, Collection, or ID requires fetching a series of Solana accounts and external JSON metadata, which can be slow and bandwidth intensive. The Wonka Index (windex) is a backend cache that enables blazing fast metadata fetches. You can use the following queries to easily fetch NFTs.
+By default, fetching NFTs by Wallet, Collection, or ID requires fetching a series of Solana accounts and external JSON metadata, which can be slow and bandwidth intensive. The Wonka Index (windex) is a backend cache that enables blazing fast metadata fetches. You can use the following queries to easily fetch NFTs. For more details, visit [WINDEX.md](WINDEX.md).
 
 ### Fetching NFTs by Candy Machine or Collection ID
 
