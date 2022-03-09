@@ -2,16 +2,6 @@ import { request, gql } from 'graphql-request';
 import { PublicKey } from '@solana/web3.js';
 import log from 'loglevel';
 
-export enum WINDEX_ENDPOINT {
-  // Solana Devnet (https://explorer.solana.com/?cluster=devnet)
-  // To explore queries: https://api.wonkalabs.xyz/v0.1/solana/graphiql?cluster=devnet
-  DEVNET = "https://api.wonkalabs.xyz/v0.1/solana/devnet/graphql",
-
-  // Solana Mainnet Beta (https://explorer.solana.com/)
-  // To explore queries: https://api.wonkalabs.xyz/v0.1/solana/graphiql?cluster=mainnet
-  MAINNET = "https://api.wonkalabs.xyz/v0.1/solana/mainnet/graphql",
-}
-
 export interface CandyMachineState {
   id: string;
   items_redeemed: number;
@@ -105,9 +95,17 @@ function nftsToCollectionItems(nfts: nft[]): CollectionItem[] {
  * - NFT by Mint Address
  */
 export default class Windex {
+  // Solana Devnet (https://explorer.solana.com/?cluster=devnet)
+  // To explore queries: https://api.wonkalabs.xyz/v0.1/solana/graphiql?cluster=devnet
+  static DEVNET_ENDPOINT = "https://api.wonkalabs.xyz/v0.1/solana/devnet/graphql?src=wonka-js";
+
+  // Solana Mainnet Beta (https://explorer.solana.com/)
+  // To explore queries: https://api.wonkalabs.xyz/v0.1/solana/graphiql?cluster=mainnet
+  static MAINNET_ENDPOINT = "https://api.wonkalabs.xyz/v0.1/solana/mainnet/graphql?src=wonka-js";
+
   public static async fetchCandyMachineState(
     candyMachineId: PublicKey,
-    endpoint: WINDEX_ENDPOINT = WINDEX_ENDPOINT.DEVNET,
+    endpoint: string = Windex.DEVNET_ENDPOINT,
   ): Promise<CandyMachineState> {
     log.info(`Fetching candy machine state for candy machine with ID: ${candyMachineId.toString()}`);
     const fetchCandyMachineStateQuery = gql`
@@ -124,15 +122,23 @@ export default class Windex {
     return results.candyMachineV2 as CandyMachineState;
   }
 
-  public static async fetchNFTsByCandyMachine(
-    candyMachineId: PublicKey,
+  public static async fetchNFTsByCandyMachineID(
+    candyMachineID: PublicKey,
     first: number = 20,
-    endpoint: WINDEX_ENDPOINT = WINDEX_ENDPOINT.DEVNET,
+    endpoint: string = Windex.DEVNET_ENDPOINT,
   ): Promise<CollectionItem[]> {
-    log.info(`Fetching NFTs by candy machine with ID: ${candyMachineId.toString()}`);
+    return await Windex.fetchNFTsByCollectionID(candyMachineID);
+  }
+
+  public static async fetchNFTsByCollectionID(
+    collectionID: PublicKey,
+    first: number = 20,
+    endpoint: string = Windex.DEVNET_ENDPOINT,
+  ): Promise<CollectionItem[]> {
+    log.info(`Fetching NFTs by candy machine with ID: ${collectionID.toString()}`);
     const fetchNFTsByCandyMachineQuery = gql`
     {
-      nftsByCollection(collectionId:"${candyMachineId.toString()}", first:${first}) {
+      nftsByCollection(collectionId:"${collectionID.toString()}", first:${first}) {
         edges {
           node {
             id
@@ -176,7 +182,7 @@ export default class Windex {
   public static async fetchNFTsByWallet(
     walletAddress: PublicKey,
     first: number = 20,
-    endpoint: WINDEX_ENDPOINT = WINDEX_ENDPOINT.DEVNET,
+    endpoint: string = Windex.DEVNET_ENDPOINT,
   ): Promise<CollectionItem[]> {
     log.info(`Fetching NFTs by wallet with ID: ${walletAddress.toString()}`);
     const fetchNFTsByCandyMachineQuery = gql`
@@ -224,7 +230,7 @@ export default class Windex {
 
   public static async fetchNFTByMintAddress(
     mintAddress: PublicKey,
-    endpoint: WINDEX_ENDPOINT = WINDEX_ENDPOINT.DEVNET,
+    endpoint: string = Windex.DEVNET_ENDPOINT,
   ): Promise<CollectionItem | null> {
     log.info(`Fetching NFTs by mint address with ID: ${mintAddress.toString()}`);
     const fetchNFTsByCandyMachineQuery = gql`

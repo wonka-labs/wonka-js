@@ -129,7 +129,12 @@ To display all NFTs in a collection, you can query Windex by Candy Machine ID or
 
 ```JS
 const fetchNFTsByCandyMachine = async(candyMachineId: PublicKey) => {
-  const nfts = await Windex.fetchNFTsByCandyMachine(testCandyMachineId, 20, WINDEX_ENDPOINT.DEVNET);
+  const nfts = await Windex.fetchNFTsByCandyMachineID(candyMachineId, 20, Windex.DEVNET_ENDPOINT);
+  console.log(`Retrieved ${nfts.length} NFTs!`);
+}
+
+const fetchNFTsByCollection = async(collectionId: PublicKey) => {
+  const nfts = await Windex.fetchNFTsByCollectionID(collectionId, 20, Windex.DEVNET_ENDPOINT);
   console.log(`Retrieved ${nfts.length} NFTs!`);
 }
 ```
@@ -138,7 +143,7 @@ const fetchNFTsByCandyMachine = async(candyMachineId: PublicKey) => {
 
 ```JS
 const fetchNFTsByWallet = async(walletAddress: PublicKey) => {
-  const nfts = await Windex.fetchNFTsByWallet(walletAddress, 20, WINDEX_ENDPOINT.DEVNET);
+  const nfts = await Windex.fetchNFTsByWallet(walletAddress, 20, Windex.DEVNET_ENDPOINT);
   console.log(`Retrieved ${nfts.length} NFTs in ${walletAddress}'s wallet!`);
 }
 ```
@@ -147,7 +152,7 @@ const fetchNFTsByWallet = async(walletAddress: PublicKey) => {
 
 ```JS
 const fetchNFTsByMintAddress = async(mintAddress: PublicKey) => {
-  const nft = await Windex.fetchNFTByMintAddress(mintAddress, WINDEX_ENDPOINT.DEVNET);
+  const nft = await Windex.fetchNFTByMintAddress(mintAddress, Windex.DEVNET_ENDPOINT);
   if (!nft) {
     console.log("nft not found!");
   } else {

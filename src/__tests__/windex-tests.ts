@@ -1,4 +1,4 @@
-import { Windex, WINDEX_ENDPOINT } from '../windex';
+import { Windex } from '../windex';
 import {PublicKey} from '@solana/web3.js'
 
 const testCandyMachineId = new PublicKey("Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb")
@@ -12,7 +12,7 @@ test('should be able to fetch candy machine state', () => {
 });
 
 test('should be able to fetch first candy machine NFT', () => {
-  return Windex.fetchNFTsByCandyMachine(testCandyMachineId, 2).then(results => {
+  return Windex.fetchNFTsByCandyMachineID(testCandyMachineId, 2).then(results => {
     expect(results[0].address).toBeDefined()
     expect(results[0].name).toBeDefined()
     expect(results[0].image_url).toBeDefined()
@@ -30,7 +30,7 @@ test('should be able to fetch NFT by Wallet', () => {
 
 test('should be able to fetch NFT by Wallet (mainnet)', () => {
   const testWalletId = new PublicKey("BYeHCJtokQecDkN34ZE4fWgF7U4vDtwjX6bkaiaprQmt")
-  return Windex.fetchNFTsByWallet(testWalletId, 2, WINDEX_ENDPOINT.MAINNET).then(results => {
+  return Windex.fetchNFTsByWallet(testWalletId, 2, Windex.MAINNET_ENDPOINT).then(results => {
     expect(results[0].address).toBeDefined()
     expect(results[0].name).toBeDefined()
     expect(results[0].image_url).toBeDefined()
