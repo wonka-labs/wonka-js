@@ -2,6 +2,8 @@
 
 `Wonka JS` is the easiest way to mint from [Candy Machine](https://docs.metaplex.com/candy-machine-v2/introduction) and fetch NFTs through JS APIs. You can see an end to end example in [Next.js demo project](https://github.com/wonka-labs/wonka-js/tree/main/examples/next-js) as well as debug using the [command line testing tool](https://github.com/wonka-labs/wonka-js/tree/main/cli). 
 
+For using Wonka's Solana NFT indexing APIs, checkout [Windex Documentation](https://github.com/wonka-labs/wonka-js/blob/main/WINDEX.md).
+
 ![FI3xQ2FVcAQO3wK](https://user-images.githubusercontent.com/796815/153501801-7b3b5d27-a747-4df8-8cec-c5c7d2b233bb.jpeg)
 
 
