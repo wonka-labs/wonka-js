@@ -1,6 +1,6 @@
 # Wonka JS
 
-`Wonka JS` is the easiest way to mint [Candy Machine](https://docs.metaplex.com/candy-machine-v2/introduction) NFTs through JS APIs. You can see an end to end example in [Next.js demo project](https://github.com/TritonLabs/wonka/tree/main/examples/next-js) as well as debug using the [command line testing tool](https://github.com/TritonLabs/wonka/tree/main/cli). 
+`Wonka JS` is the easiest way to mint from [Candy Machine](https://docs.metaplex.com/candy-machine-v2/introduction) and fetch NFTs through JS APIs. You can see an end to end example in [Next.js demo project](https://github.com/TritonLabs/wonka/tree/main/examples/next-js) as well as debug using the [command line testing tool](https://github.com/TritonLabs/wonka/tree/main/cli). 
 
 ![FI3xQ2FVcAQO3wK](https://user-images.githubusercontent.com/796815/153501801-7b3b5d27-a747-4df8-8cec-c5c7d2b233bb.jpeg)
 
@@ -18,7 +18,7 @@ These commands are useful if you need to build a custom facing front end, and do
 ## Installation
 `npm install @triton-labs/wonka`
 
-## APIs
+## Wonka APIs
 
 ### Getting Machine State 
 Returns info about currently available mints in Candy Machine, how many were already minted, how long is left for the auction, etc. 
@@ -116,3 +116,40 @@ const candyMachineId = process.env.REACT_APP_CANDY_MACHINE_ID!; // For React
 ```
 
 Read more about these in the docs: [React .env](https://create-react-app.dev/docs/adding-custom-environment-variables/) and [Next.js .env](https://nextjs.org/docs/basic-features/environment-variables).
+
+## Windex APIs
+
+By default, fetching NFTs by Wallet, Collection, or ID requires fetching a series of Solana accounts and external JSON metadata, which can be slow and bandwidth intensive. The Wonka Index (windex) is a backend cache that enables blazing fast metadata fetches. You can use the following queries to easily fetch NFTs.
+
+### Fetching NFTs by Candy Machine or Collection ID
+
+To display all NFTs in a collection, you can query Windex by Candy Machine ID or Collection ID (the collection id is the first verified creator in the NFT's metadata).
+
+```JS
+const fetchNFTsByCandyMachine = async(candyMachineId: PublicKey) => {
+  const nfts = await Windex.fetchNFTsByCandyMachine(testCandyMachineId, 20, WINDEX_ENDPOINT.DEVNET);
+  console.log(`Retrieved ${nfts.length} NFTs!`);
+}
+```
+
+### Fetching NFTs in a Wallet Address
+
+```JS
+const fetchNFTsByWallet = async(walletAddress: PublicKey) => {
+  const nfts = await Windex.fetchNFTsByWallet(walletAddress, 20, WINDEX_ENDPOINT.DEVNET);
+  console.log(`Retrieved ${nfts.length} NFTs in ${walletAddress}'s wallet!`);
+}
+```
+
+### Fetching an NFT by Mint Address
+
+```JS
+const fetchNFTsByMintAddress = async(mintAddress: PublicKey) => {
+  const nft = await Windex.fetchNFTByMintAddress(mintAddress, WINDEX_ENDPOINT.DEVNET);
+  if (!nft) {
+    console.log("nft not found!");
+  } else {
+    console.log(`Fetched ${nft.address}: ${nft.name}`);
+  }
+}
+```
