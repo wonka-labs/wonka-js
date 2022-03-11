@@ -4,6 +4,9 @@ The Wonka Index API (called "Windex") is a blazing fast API on top of Solana/Met
 
 The Wonka Index is currently in Alpha testing. Please join our [Discord](https://discord.gg/p2wXHT3vm7) to report issues or suggest new features, or open up a Github Issue.
 
+![windex](https://user-images.githubusercontent.com/796815/157983069-284a79f0-2379-412a-a529-eaca36a2428b.jpeg)
+
+
 ## Javascript Library
 
 The easiest way to get started with Windex is using the `wonka` JS library.
