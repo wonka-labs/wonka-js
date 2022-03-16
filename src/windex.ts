@@ -150,7 +150,7 @@ export default class Windex {
         twitterHandleForAddress(address: "${address}")
       }`;
       const fetchTwitterHandleQueryResults = await request(Windex.MAINNET_ENDPOINT, fetchTwitterHandleQuery);
-      return { address: address, solName: solDomain, twitter: fetchTwitterHandleQueryResults.twitterHandleForAddress };
+      return { address, solName: solDomain, twitter: fetchTwitterHandleQueryResults.twitterHandleForAddress };
     }
     // 3. If nothing else was found, return null.
     return null;
