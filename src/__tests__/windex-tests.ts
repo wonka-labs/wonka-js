@@ -1,8 +1,9 @@
 import { Windex } from '../windex';
-import {PublicKey} from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js';
+import { AssertionError } from 'assert';
 
-const testCandyMachineId = new PublicKey("Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb")
-const testWalletAddress = new PublicKey("BYeHCJtokQecDkN34ZE4fWgF7U4vDtwjX6bkaiaprQmt")
+const testCandyMachineId = new PublicKey('Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb');
+const testWalletAddress = new PublicKey('BYeHCJtokQecDkN34ZE4fWgF7U4vDtwjX6bkaiaprQmt');
 
 test('should be able to fetch sol name', () => {
   return Windex.fetchSolDomainMetadataByAddress(testWalletAddress).then(results => {
@@ -10,6 +11,33 @@ test('should be able to fetch sol name', () => {
     expect(results.solName).toBe("kunalm.sol");
     expect(results.twitter).toBe("@kunal_modi");
   });
+});
+
+test('should be able to fetch address by sol name', () => {
+  return Windex.fetchAddressBySolDomain('kunalm.sol').then((results) => {
+    expect(results!.address).toBe('BYeHCJtokQecDkN34ZE4fWgF7U4vDtwjX6bkaiaprQmt');
+    expect(results!.solName).toBe('kunalm.sol');
+    expect(results!.twitter).toBe('@kunal_modi');
+  });
+});
+
+test('should gracefully handle a sol name that does not exist', () => {
+  return Windex.fetchAddressBySolDomain('null-ice-ice-baby-null.sol').then((results) => {
+    expect(results).toBeNull();
+  });
+});
+
+test('should gracefully handle a sol name that has address by not twitter handle', () => {
+  return Windex.fetchAddressBySolDomain('zorayr.sol').then((results) => {
+    expect(results).not.toBeNull();
+    expect(results!.address).toBe('6zsuBDfuvtxK5FD9tf8u8LfrYBVnxDWRhj43snmC6Qx6');
+    expect(results!.solName).toBe('zorayr.sol');
+    expect(results!.twitter).toBeNull();
+  });
+});
+
+test('should throw exception in case sol name is invalid', async () => {
+  await expect(Windex.fetchAddressBySolDomain('zorayr')).rejects.toThrow('Sol domain names should end in sol.');
 });
 
 test('should be able to fetch candy machine state', () => {

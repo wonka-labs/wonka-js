@@ -103,6 +103,7 @@ function nftsToCollectionItems(nfts: nft[]): CollectionItem[] {
  * - NFTs by Candy Machine
  * - NFTs by Wallet Address
  * - NFT by Mint Address
+ * - Sol Domain Name by Address [and vice versa]
  */
 export default class Windex {
   // Solana Devnet (https://explorer.solana.com/?cluster=devnet)
@@ -132,15 +133,42 @@ export default class Windex {
     return results.candyMachineV2 as CandyMachineState;
   }
 
+  public static async fetchAddressBySolDomain(solDomain: string): Promise<SolDomainMetadata | null> {
+    log.info(`Fetching address by sol domain: ${solDomain}`);
+    if (!solDomain.endsWith(".sol")) { throw new Error("Sol domain names should end in sol.") }
+    // 1. First fetch the public address of the sol domain.
+    const fetchAddressQuery = gql`
+    {
+      addressForSolDomainName(domainName: "${solDomain}")
+    }`;
+    const fetchAddressQueryResults = await request(Windex.MAINNET_ENDPOINT, fetchAddressQuery);
+    // 2. If address is found, try to fetch the twitter handle. Long term, we should combine these queries.
+    if (fetchAddressQueryResults.addressForSolDomainName) {
+      const address = fetchAddressQueryResults.addressForSolDomainName;
+      const fetchTwitterHandleQuery = gql`
+      {
+        twitterHandleForAddress(address: "${address}")
+      }`;
+      const fetchTwitterHandleQueryResults = await request(Windex.MAINNET_ENDPOINT, fetchTwitterHandleQuery);
+      return { address: address, solName: solDomain, twitter: fetchTwitterHandleQueryResults.twitterHandleForAddress };
+    }
+    // 3. If nothing else was found, return null.
+    return null;
+  }
+
   public static async fetchSolDomainMetadataByAddress(address: PublicKey): Promise<SolDomainMetadata> {
-    log.info(`Fetching Sol Name by address: ${address.toString()}`);
+    log.info(`Fetching sol domain by address: ${address.toString()}`);
     const fetchSolNameQuery = gql`
     {
       solDomainNameForAddress(address: "${address.toString()}")
       twitterHandleForAddress(address: "${address.toString()}")
     }`;
     const results = await request(Windex.MAINNET_ENDPOINT, fetchSolNameQuery);
-    return { address: address.toString(), solName: results.solDomainNameForAddress, twitter: results.twitterHandleForAddress };
+    return {
+      address: address.toString(),
+      solName: results.solDomainNameForAddress,
+      twitter: results.twitterHandleForAddress,
+    };
   }
 
   public static async fetchNFTsByCandyMachineID(
