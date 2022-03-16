@@ -1,6 +1,6 @@
 {
   "name": "@wonka-labs/wonka-js",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Wonka JS is the easiest way to mint and fetch NFTs through JS APIs.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

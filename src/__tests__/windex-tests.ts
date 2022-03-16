@@ -2,6 +2,15 @@ import { Windex } from '../windex';
 import {PublicKey} from '@solana/web3.js'
 
 const testCandyMachineId = new PublicKey("Hkunn4hct84zSPNpyQygThUKn8RUBVf5b4r975NRaHPb")
+const testWalletAddress = new PublicKey("BYeHCJtokQecDkN34ZE4fWgF7U4vDtwjX6bkaiaprQmt")
+
+test('should be able to fetch sol name', () => {
+  return Windex.fetchSolDomainMetadataByAddress(testWalletAddress).then(results => {
+    expect(results.address).toBe(testWalletAddress.toString());
+    expect(results.solName).toBe("kunalm.sol");
+    expect(results.twitter).toBe("@kunal_modi");
+  });
+});
 
 test('should be able to fetch candy machine state', () => {
   return Windex.fetchCandyMachineState(testCandyMachineId).then(results => {

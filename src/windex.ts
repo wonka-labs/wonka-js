@@ -2,6 +2,12 @@ import { request, gql } from 'graphql-request';
 import { PublicKey } from '@solana/web3.js';
 import log from 'loglevel';
 
+export interface SolDomainMetadata {
+  address: string;
+  solName?: string;
+  twitter?: string;
+}
+
 export interface CandyMachineState {
   id: string;
   items_redeemed: number;
@@ -22,15 +28,15 @@ export interface CollectionItem {
     address: string;
     verified: boolean;
     share: number;
-  }[],
+  }[];
   files: {
     uri: string | null;
     type: string | null;
-  }[],
+  }[];
   attributes: {
     trait_type: string | null;
     value: string | null;
-  }[],
+  }[];
 }
 
 type nft = {
@@ -47,21 +53,25 @@ type nft = {
       address: string;
       verified: boolean;
       share: number;
-    }[],
+    }[];
   };
   external_metadata: {
     description: string | null;
     external_url: string | null;
     properties: {
-      files: {
-        uri: string | null;
-        type: string | null;
-      }[] | null;
+      files:
+        | {
+            uri: string | null;
+            type: string | null;
+          }[]
+        | null;
     } | null;
-    attributes: {
-      trait_type: string | null;
-      value: string | null;
-    }[] | null;
+    attributes:
+      | {
+          trait_type: string | null;
+          value: string | null;
+        }[]
+      | null;
   } | null;
 };
 
@@ -97,11 +107,11 @@ function nftsToCollectionItems(nfts: nft[]): CollectionItem[] {
 export default class Windex {
   // Solana Devnet (https://explorer.solana.com/?cluster=devnet)
   // To explore queries: https://api.wonkalabs.xyz/v0.1/solana/graphiql?cluster=devnet
-  static DEVNET_ENDPOINT = "https://api.wonkalabs.xyz/v0.1/solana/devnet/graphql?src=wonka-js";
+  static DEVNET_ENDPOINT = 'https://api.wonkalabs.xyz/v0.1/solana/devnet/graphql?src=wonka-js';
 
   // Solana Mainnet Beta (https://explorer.solana.com/)
   // To explore queries: https://api.wonkalabs.xyz/v0.1/solana/graphiql?cluster=mainnet
-  static MAINNET_ENDPOINT = "https://api.wonkalabs.xyz/v0.1/solana/mainnet/graphql?src=wonka-js";
+  static MAINNET_ENDPOINT = 'https://api.wonkalabs.xyz/v0.1/solana/mainnet/graphql?src=wonka-js';
 
   public static async fetchCandyMachineState(
     candyMachineId: PublicKey,
@@ -120,6 +130,17 @@ export default class Windex {
     }`;
     const results = await request(endpoint, fetchCandyMachineStateQuery);
     return results.candyMachineV2 as CandyMachineState;
+  }
+
+  public static async fetchSolDomainMetadataByAddress(address: PublicKey): Promise<SolDomainMetadata> {
+    log.info(`Fetching Sol Name by address: ${address.toString()}`);
+    const fetchSolNameQuery = gql`
+    {
+      solDomainNameForAddress(address: "${address.toString()}")
+      twitterHandleForAddress(address: "${address.toString()}")
+    }`;
+    const results = await request(Windex.MAINNET_ENDPOINT, fetchSolNameQuery);
+    return { address: address.toString(), solName: results.solDomainNameForAddress, twitter: results.twitterHandleForAddress };
   }
 
   public static async fetchNFTsByCandyMachineID(
