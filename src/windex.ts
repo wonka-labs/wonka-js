@@ -148,7 +148,7 @@ export default class Windex {
     first: number = 20,
     endpoint: string = Windex.DEVNET_ENDPOINT,
   ): Promise<CollectionItem[]> {
-    return await Windex.fetchNFTsByCollectionID(candyMachineID);
+    return await Windex.fetchNFTsByCollectionID(candyMachineID, first, endpoint);
   }
 
   public static async fetchNFTsByCollectionID(
