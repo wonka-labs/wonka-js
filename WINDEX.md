@@ -54,6 +54,44 @@ const fetchNFTsByMintAddress = async(mintAddress: PublicKey) => {
 }
 ```
 
+### Fetching Sol Domain Name from Wallet Address
+
+```JS
+import Windex from "@wonka-labs/wonka-js";
+import { PublicKey } from '@solana/web3.js';
+
+async function fetchSolDomainByWalletAddress(walletAddress: PublicKey) {
+  const solDomainMetadata = await Windex.fetchSolDomainMetadataByAddress(walletAddress)
+  console.log(solDomainMetadata)
+}
+```
+
+### Fetching Wallet Address from Sol Domain
+
+```JS
+import Windex from "@wonka-labs/wonka-js";
+
+async function fetchWalletAddressBySolDomain(solDomain: string) {
+  const solDomainMetadata = await Windex.fetchAddressBySolDomain(
+    solDomain
+  );
+  return solDomainMetadata?.address
+}
+```
+
+### Fetching Twitter Handle from Sol Domain
+
+```JS
+import Windex from "@wonka-labs/wonka-js";
+
+async function fetchTwitterHandleBySolDomain(solDomain: string) {
+  const solDomainMetadata = await Windex.fetchAddressBySolDomain(
+    solDomain
+  );
+  return solDomainMetadata?.twitter
+}
+```
+
 ## GraphQL API (Advanced)
 
 Alternatively, you can use the GraphQL API to access the exact fields you need. The easiest way to craft queries is through the [Windex interactive query editor](https://api.wonkalabs.xyz/v0.1/solana/graphiql?cluster=devnet).
