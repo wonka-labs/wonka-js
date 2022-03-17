@@ -21,6 +21,9 @@ npm install @wonka-labs/wonka-js
 To display all NFTs in a collection, you can query Windex by Candy Machine ID or Collection ID (the collection id is the first verified creator in the NFT's metadata).
 
 ```JS
+import Windex from "@wonka-labs/wonka-js";
+import { PublicKey } from '@solana/web3.js';
+
 const fetchNFTsByCandyMachine = async(candyMachineId: PublicKey) => {
   const nfts = await Windex.fetchNFTsByCandyMachineID(candyMachineId, 20, Windex.DEVNET_ENDPOINT);
   console.log(`Retrieved ${nfts.length} NFTs!`);
@@ -35,6 +38,9 @@ const fetchNFTsByCollection = async(collectionId: PublicKey) => {
 ### Fetching NFTs in a Wallet Address
 
 ```JS
+import Windex from "@wonka-labs/wonka-js";
+import { PublicKey } from '@solana/web3.js';
+
 const fetchNFTsByWallet = async(walletAddress: PublicKey) => {
   const nfts = await Windex.fetchNFTsByWallet(walletAddress, 20, Windex.DEVNET_ENDPOINT);
   console.log(`Retrieved ${nfts.length} NFTs in ${walletAddress}'s wallet!`);
@@ -44,6 +50,9 @@ const fetchNFTsByWallet = async(walletAddress: PublicKey) => {
 ### Fetching an NFT by Mint Address
 
 ```JS
+import Windex from "@wonka-labs/wonka-js";
+import { PublicKey } from '@solana/web3.js';
+
 const fetchNFTsByMintAddress = async(mintAddress: PublicKey) => {
   const nft = await Windex.fetchNFTByMintAddress(mintAddress, Windex.DEVNET_ENDPOINT);
   if (!nft) {
