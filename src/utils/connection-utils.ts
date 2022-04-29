@@ -1,4 +1,4 @@
-import { Provider } from '@project-serum/anchor';
+import { AnchorProvider as Provider } from '@project-serum/anchor';
 import { Keypair, Transaction, TransactionInstruction, PublicKey } from '@solana/web3.js';
 
 export const sendTransaction = async (
@@ -12,7 +12,7 @@ export const sendTransaction = async (
   transaction.recentBlockhash = (await provider.connection.getRecentBlockhash()).blockhash;
   transaction.feePayer = feePayer;
   transaction.partialSign(...signers);
-  return await provider.send(transaction, signers, {
+  return await provider.sendAndConfirm(transaction, signers, {
     skipPreflight: false,
   });
 };
