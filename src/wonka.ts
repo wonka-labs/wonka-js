@@ -1,4 +1,4 @@
-import { Provider } from '@project-serum/anchor';
+import { AnchorProvider as Provider } from '@project-serum/anchor';
 import { PublicKey, Connection } from '@solana/web3.js';
 import { web3 } from '@project-serum/anchor';
 import { getCandyMachineMints, getMintMetadata, updateMintImage, updateMintGLB } from './utils/metadata-utils';

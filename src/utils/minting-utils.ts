@@ -1,4 +1,4 @@
-import { Program, Provider, web3 } from '@project-serum/anchor';
+import { Program, AnchorProvider as Provider, web3 } from '@project-serum/anchor';
 import { PublicKey, Keypair } from '@solana/web3.js';
 import { Token } from '@solana/spl-token';
 import * as anchor from '@project-serum/anchor';
