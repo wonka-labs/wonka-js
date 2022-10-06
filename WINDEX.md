@@ -1,3 +1,5 @@
+*⚠️ The Windex service is being deprecated as of 10/17/2022. After that, all responses will return errors. See [here](https://discord.com/channels/944635349009833985/953849529919238234/1024135909563699230) for more information and alternatives.*
+
 # Windex
 
 The Wonka Index API (called "Windex") is a blazing fast API on top of Solana/Metaplex NFTs, to enable quick and performant fetching of NFTs by collection, wallet, and mint.
